@@ -20,12 +20,22 @@
 
 #ifndef _SCI_READER_H
 #define _SCI_READER_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
 
+#ifndef _FFD_DATA_READER_H
+#define _FFD_DATA_READER_H
 #include "ffd_data_reader.h"
+#endif
 
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include "utility.h"
+#endif
 
 FILE *file_params;
 
@@ -99,4 +109,4 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX);
 ///////////////////////////////////////////////////////////////////////////////
 void mark_cell(PARA_DATA *para, REAL **var, int **BINDEX);
 
-#endif
+

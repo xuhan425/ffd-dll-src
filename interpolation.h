@@ -17,9 +17,12 @@
 
 #ifndef _INTERPOLATION_H
 #define _INTERPOLATION_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
-
+#endif
 
 #include "utility.h"
 
@@ -61,4 +64,4 @@ REAL interpolation_bilinear(REAL x_1, REAL y_1, REAL z_1,
                             REAL d000, REAL d010, REAL d100, REAL d110,
                             REAL d001, REAL d011, REAL d101, REAL d111);
 
-#endif
+

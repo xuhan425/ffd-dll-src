@@ -19,8 +19,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef _CHEN_ZERO_EQU_MODEL_H_
 #define _CHEN_ZERO_EQU_MODEL_H_
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,4 +68,4 @@ REAL nu_t_chen_zero_equ(PARA_DATA *para, REAL **var, int i, int j, int k);
 ///////////////////////////////////////////////////////////////////////////////
 REAL alpha_t_chen_zero_equ(PARA_DATA *para, REAL **var);
 
-#endif
+

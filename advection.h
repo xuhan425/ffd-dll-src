@@ -31,12 +31,32 @@
 
 #ifndef _ADVECTION_H
 #define _ADVECTION_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
+
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include "utility.h"
+#endif
+
+#ifndef _BOUNDARY_H
+#define _BOUNDARY_H
 #include "boundary.h"
+#endif
+
+#ifndef _INTERPOLATION_H
+#define _INTERPOLATION_H
 #include "interpolation.h"
+#endif
+
+#ifndef _SOLVER_H
+#define _SOLVER_H
 #include "solver.h"
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,4 +221,4 @@ int implicit_vy(PARA_DATA *para, REAL **var, int var_type, REAL *d, REAL *d0, in
 int implicit_vz(PARA_DATA *para, REAL **var, int var_type, REAL *d, REAL *d0, int index, int ** BINDEX);
 int implicit_scalar(PARA_DATA *para, REAL **var, int var_type, REAL *d, REAL *d0, int index, int ** BINDEX);
 
-#endif
+

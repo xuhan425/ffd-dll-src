@@ -20,12 +20,22 @@
 
 #ifndef _SOLVER_GS_H
 #define _SOLVER_GS_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
 
+#ifndef _BOUNDARY_H
+#define _BOUNDARY_H
 #include "boundary.h"
+#endif
 
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include "utility.h"
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,4 +86,3 @@ int Jacobi_iter(PARA_DATA *para, REAL **var, REAL *x, REAL *flag, int num_swipe)
 ///////////////////////////////////////////////////////////////////////////////
 int Jacobi(PARA_DATA *para, REAL **var, REAL *flag, REAL *x, int num_swipe);
 
-#endif

@@ -19,13 +19,42 @@
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef _FFD_H
 #define _FFD_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
+
+#ifndef _FFD_DLL_H
+#define FFD_DLL_H
+#include "ffd_dll.h"
+#endif
+
+#ifndef _TIMING_H
+#define _TIMING_H
 #include "timing.h"
+#endif
+
+#ifndef _SOLVER_H
+#define _SOLVER_H
 #include "solver.h"
+#endif
+
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include "utility.h"
+#endif
+
+#ifndef _DATA_WRITER_H
+#define _DATA_WRITER_H
 #include "data_writer.h"
+#endif
+
+#ifndef _INITIALIZATION_H
+#define _INITIALIZATION_H
 #include "initialization.h"
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Main routine of FFD
@@ -54,4 +83,4 @@ int allocate_memory (PARA_DATA *para);
 ///////////////////////////////////////////////////////////////////////////////
 void modelicaError(char *msg);
 
-#endif
+//#endif

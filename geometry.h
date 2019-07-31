@@ -16,10 +16,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef _GEOMETRY_H
 #define _GEOMETRY_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
 
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include "utility.h"
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -150,4 +157,4 @@ int bounary_area(PARA_DATA *para, REAL **var, int **BINDEX);
 ///////////////////////////////////////////////////////////////////////////////
 int rack_fluid_area(PARA_DATA *para, REAL **var, int **BINDEX);
 
-#endif
+//#endif

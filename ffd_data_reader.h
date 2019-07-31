@@ -20,12 +20,16 @@
 
 #ifndef _FFD_DATA_READER_H
 #define _FFD_DATA_READER_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
 
 #include "utility.h"
 
-FILE *file_old_ffd;
+FILE* file_old_ffd;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Read the previous FFD simulation data in a format of standard output
@@ -37,4 +41,4 @@ FILE *file_old_ffd;
 ///////////////////////////////////////////////////////////////////////////////
 int read_ffd_data(PARA_DATA *para, REAL **var);
 
-#endif
+

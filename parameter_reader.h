@@ -17,8 +17,12 @@
 
 #ifndef _PARAMETER_READER_H
 #define _PARAMETER_READER_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
 
 #include "utility.h"
 
@@ -44,4 +48,4 @@ int assign_parameter(PARA_DATA *para, char *string);
 ///////////////////////////////////////////////////////////////////////////////
 int read_parameter(PARA_DATA *para);
 
-#endif
+

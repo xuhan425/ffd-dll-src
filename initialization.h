@@ -20,13 +20,41 @@
 
 #ifndef _INITIALIZATION_H
 #define _INITIALIZATION_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
+
+#ifndef _PARAMETER_READER_H
+#define _PARAMETER_READER_H
 #include "parameter_reader.h"
+#endif
+#ifndef _COSIMULATION_H
+#define _COSIMULATION_H
+#include "cosimulation.h"
+#endif
+
+#ifndef _SCI_READER_H
+#define _SCI_READER_H
 #include "sci_reader.h"
+#endif
+
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include "utility.h"
+#endif
+
+#ifndef _SOLVER_H
+#define _SOLVER_H
 #include "solver.h"
+#endif
+
+#ifndef _GEOMETRY_H
+#define _GEMOMETRY_H
 #include "geometry.h"
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,4 +105,4 @@ int flat_var(PARA_DATA *para, REAL **var, REAL *var_flat);
 int flat_index(PARA_DATA *para, int **BINDEX, int *bindex_flat);
 int unflat_var(PARA_DATA *para, REAL **var, REAL *var_flat);
 
-#endif
+//#endif

@@ -20,13 +20,22 @@
 
 #ifndef _UTILITY_H
 #define _UTILITY_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
+
+#ifndef _FFD_H
+#define _FFD_H
 #include "ffd.h"
+#endif
+
+#ifndef _GEOMETRY_H
+#define _GEOMETRY_H
 #include "geometry.h"
-
-
-FILE *file_log;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Check the residual of equation
@@ -325,4 +334,4 @@ int get_monitor_index(PARA_DATA *para, REAL **var);
 ///////////////////////////////////////////////////////////////////////////////
 int write_monitor_data(PARA_DATA *para, REAL **var);
 
-#endif
+

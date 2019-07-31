@@ -106,6 +106,25 @@ int allocate_memory (PARA_DATA *para) {
   return 0;
 } // End of allocate_memory()
 
+	/*
+		* Assign the parameter for coupled simulation
+		*
+		* @para cosim Pointer to the coupled simulation parameters
+		*
+		* @return 0 if no error occurred
+		*/
+int ffd_cosimulation(CosimulationData* cosim) {
+	para.cosim = (CosimulationData*)malloc(sizeof(CosimulationData));
+	para.cosim = cosim;
+
+	if (ffd(1) != 0) {
+		cosim->para->ffdError = 1;
+		return 1;
+	}
+	else
+		return 0;
+} /* End of ffd_cosimulation()*/
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Main routine of FFD
 ///
@@ -212,3 +231,28 @@ int ffd(int cosimulation) {
 
   return 0;
 } // End of ffd( )
+
+/*
+		* Write error message to Modelica
+		*
+		* @para msg Pointer to message to be written.
+		*
+		* @return no return
+		*/
+void modelicaError(char* msg) {
+	/*Allocate memory for cosim->ffd->msg*/
+	para.cosim->ffd->msg = (char*)malloc(400 * sizeof(char));
+	if (para.cosim->ffd->msg == NULL) {
+		ffd_log("ffd(): Failed to allocate memory for cosim->ffd->msg", FFD_ERROR);
+	}
+
+	strcpy(para.cosim->ffd->msg, msg);
+	/* Write the command to stop the cosimulation*/
+	para.cosim->para->flag = 2;
+	/* Indicate there is an error*/
+	para.cosim->para->ffdError = 1;
+
+	/*Free memory for cosim->ffd->msg*/
+	free(para.cosim->ffd->msg);
+
+} /* End of modelicaError*/

@@ -21,11 +21,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef _DATA_WRITER_H
 #define _DATA_WRITER_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
 
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include "utility.h"
-
+#endif
 
 FILE *file1;
 
@@ -104,5 +110,3 @@ int write_SCI(PARA_DATA *para, REAL **var, char *name);
 
 int write_vtk_data(PARA_DATA *para, REAL **var, char *name);
 int write_vtk_fluid(PARA_DATA *para, REAL **var, char *name);
-
-#endif

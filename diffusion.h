@@ -22,16 +22,32 @@
 ///////////////////////////////////////////////////////////////////////////////
 #ifndef _DIFFUSION_H_
 #define _DIFFUSION_H_
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
 
+#ifndef _BOUNDARY_H
+#define _BOUNDARY_H
 #include "boundary.h"
+#endif
 
+#ifndef _SOLVER_H
+#define _SOLVER_H
 #include "solver.h"
+#endif
 
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include "utility.h"
+#endif
 
+#ifndef _CHEN_ZERO_EQU_MODEL_h
+#define _CHEN_ZERO_EQU_MODEL_h
 #include "chen_zero_equ_model.h"
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,4 +94,3 @@ int coef_diff(PARA_DATA *para, REAL **var, REAL *psi, REAL *psi0,
 ///////////////////////////////////////////////////////////////////////////////
 int source_diff(PARA_DATA *para, REAL **var, int var_type, int index);
 
-#endif

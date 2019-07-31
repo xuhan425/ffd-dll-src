@@ -25,14 +25,27 @@
 
 #ifndef _BOUNDARY_H
 #define _BOUNDARY_H
+#endif
 
+#ifndef _DATA_STRUCTURE_H
+#define _DATA_STRUCTURE_H
 #include "data_structure.h"
+#endif
 
+#ifndef _GEOMETRY_H
+#define _GEOMETRY_H
 #include "geometry.h"
+#endif
 
+#ifndef _UTILITY_H
+#define _UTILITY_H
 #include "utility.h"
+#endif
 
+#ifndef _CHEN_ZERO_EQU_MODEL_H
+#define _CHEN_ZERO_EQU_MODEL_H
 #include "chen_zero_equ_model.h"
+#endif
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -182,4 +195,3 @@ int set_bnd_temp_adv(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
 int set_bnd_vel_adv(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
 		int **BINDEX);
 
-#endif
