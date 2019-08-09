@@ -72,6 +72,7 @@ int read_sci_max(PARA_DATA *para, REAL **var) {
 
   // Get the first line for the length in X, Y and Z directions
   fgets(string, 400, file_params);
+  
   if (ifDouble) {
     sscanf(string, "%lf %lf %lf", &para->geom->Lx, &para->geom->Ly, &para->geom->Lz);
   }
@@ -174,7 +175,7 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
   REAL Lz = para->geom->Lz;
   REAL *gx = var[GX], *gy = var[GY], *gz = var[GZ];
   REAL *x = var[X], *y = var[Y], *z = var[Z];
-  //int IWWALL,IEWALL,ISWALL,INWALL,IBWALL,ITWALL;
+  int IWWALL,IEWALL,ISWALL,INWALL,IBWALL,ITWALL;
   int SI,SJ,SK,EI,EJ,EK,FLTMP;
   REAL TMP,MASS,U,V,W;
   char name[100];
@@ -233,7 +234,7 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
   delz[0]=0;
 
   // Read cell dimensions in X, Y, Z directions
-  if (ifDouble) {
+  /*if (ifDouble) {
     for (i = 1; i <= imax; i++) fscanf(file_params, "%lf", &delx[i]);
     fscanf(file_params, "\n");
     for (j = 1; j <= jmax; j++) fscanf(file_params, "%lf", &dely[j]);
@@ -248,7 +249,14 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
     fscanf(file_params, "\n");
     for (k = 1; k <= kmax; k++) fscanf(file_params, "%f", &delz[k]);
     fscanf(file_params, "\n");
-  }
+  }*/
+
+  for (i = 1; i <= imax; i++) fscanf(file_params, "%lf", &delx[i]);
+  fscanf(file_params, "\n");
+  for (j = 1; j <= jmax; j++) fscanf(file_params, "%lf", &dely[j]);
+  fscanf(file_params, "\n");
+  for (k = 1; k <= kmax; k++) fscanf(file_params, "%lf", &delz[k]);
+  fscanf(file_params, "\n");
 
   // Store the locations of grid cell surfaces
   tempx = 0.0; tempy = 0.0; tempz = 0.0;
@@ -301,9 +309,9 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
   END_FOR
 
   // Get the wall property
-  //fgets(string, 400, file_params);
-  //sscanf(string,"%d%d%d%d%d%d", &IWWALL, &IEWALL, &ISWALL,
-         //&INWALL, &IBWALL, &ITWALL);
+  fgets(string, 400, file_params);
+  sscanf(string,"%d%d%d%d%d%d", &IWWALL, &IEWALL, &ISWALL,
+         &INWALL, &IBWALL, &ITWALL);
 
   /*****************************************************************************
   | Read total number of boundary conditions
@@ -366,14 +374,16 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
       | Get the boundary conditions
       .......................................................................*/
       fgets(string, 400, file_params);
-      if (ifDouble) {
+	  sscanf(string, "%d%d%d%d%d%d%lf%lf%lf%lf%lf", &SI, &SJ, &SK, &EI,
+		  &EJ, &EK, &TMP, &MASS, &U, &V, &W);
+      /*if (ifDouble) {
         sscanf(string, "%d%d%d%d%d%d%lf%lf%lf%lf%lf", &SI, &SJ, &SK, &EI,
           &EJ, &EK, &TMP, &MASS, &U, &V, &W);
       }
       else {
         sscanf(string, "%d%d%d%d%d%d%f%f%f%f%f", &SI, &SJ, &SK, &EI,
           &EJ, &EK, &TMP, &MASS, &U, &V, &W);
-      }
+      }*/
       sprintf(msg, "read_sci_input(): VX=%f, VY=%f, VZ=%f, T=%f, Xi=%f",
               U, V, W, TMP, MASS);
       ffd_log(msg, FFD_NORMAL);
@@ -435,8 +445,8 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
         }
       }
       // Assign the inlet boundary condition for each cell
-      for(ii=SI; ii<=EI; ii++){
-        for(ij=SJ; ij<=EJ; ij++){
+      for(ii=SI; ii<=EI; ii++)
+        for(ij=SJ; ij<=EJ; ij++)
           for(ik=SK; ik<=EK; ik++) {
             BINDEX[0][index] = ii;
             BINDEX[1][index] = ij;
@@ -457,8 +467,8 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
               ffd_log(msg, FFD_NORMAL);
             }
           } // End of assigning the inlet B.C. for each cell
-        }
-      }
+        
+      
     } // End of loop for each inlet boundary
   } // End of setting inlet boundary
 
@@ -760,13 +770,21 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
     /*--------------------------------------------------------------------------
     | Allocate memory for port ID
     --------------------------------------------------------------------------*/
-    para->bc->portId = (int*) malloc(para->bc->nb_port*sizeof(int));
+	para->bc->portId = (int*)malloc(para->bc->nb_port * sizeof(int));
+
     if(para->bc->portId==NULL) {
       ffd_log("read_sci_input(): "
               "Could not allocate memory for para->bc->portId.",
       FFD_ERROR);
       return 1;
     }
+  }
+
+  /*****************************************************************************
+  | initialize the para->bc->portID
+  *****************************************************************************/
+  for (i = 0; i < para->bc->nb_port; i++) {
+	  para->bc->portId[i] = 0;
   }
 
   /*****************************************************************************
@@ -1385,20 +1403,20 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
   | Read other simulation data
   *****************************************************************************/
   // Discard the unused data
+  fgets(string, 400, file_params); //maximum iteration
   //fgets(string, 400, file_params); //maximum iteration
-  //fgets(string, 400, file_params); //maximum iteration
-  //fgets(string, 400, file_params); //convergence rate
-  //fgets(string, 400, file_params); //Turbulence model
-  //fgets(string, 400, file_params); //initial value
-  //fgets(string, 400, file_params); //minimum value
-  //fgets(string, 400, file_params); //maximum value
-  //fgets(string, 400, file_params); //fts value
-  //fgets(string, 400, file_params); //under relaxation
-  //fgets(string, 400, file_params); //reference point
-  //fgets(string, 400, file_params); //monitoring point
+  fgets(string, 400, file_params); //convergence rate
+  fgets(string, 400, file_params); //Turbulence model
+  fgets(string, 400, file_params); //initial value
+  fgets(string, 400, file_params); //minimum value
+  fgets(string, 400, file_params); //maximum value
+  fgets(string, 400, file_params); //fts value
+  fgets(string, 400, file_params); //under relaxation
+  fgets(string, 400, file_params); //reference point
+  fgets(string, 400, file_params); //monitoring point
 
   // Discard setting for restarting the old FFD simulation
-  //fgets(string, 400, file_params);
+  fgets(string, 400, file_params);
   /*
   sscanf(string,"%d", &para->inpu->read_old_ffd_file);
   sprintf(msg, "read_sci_input(): para->inpu->read_old_ffd_file=%d",
@@ -1406,12 +1424,12 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
   ffd_log(msg, FFD_NORMAL);
   */
   // Discard the unused data
-  //fgets(string, 400, file_params); //print frequency
-  //fgets(string, 400, file_params); //Pressure variable Y/N
-  //fgets(string, 400, file_params); //Steady state, buoyancy.
+  fgets(string, 400, file_params); //print frequency
+  fgets(string, 400, file_params); //Pressure variable Y/N
+  fgets(string, 400, file_params); //Steady state, buoyancy.
 
   // Discard physical properties
-  //fgets(string, 400, file_params);
+  fgets(string, 400, file_params);
   /*
   sscanf(string,"%f %f %f %f %f %f %f %f %f", &para->prob->rho,
          &para->prob->nu, &para->prob->cond,
@@ -1474,8 +1492,74 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
   sprintf(msg, "read_sci_input(): Read sci input file %s",
           para->inpu->parameter_file_name);
   ffd_log(msg, FFD_NORMAL);
+  if (para->cosim->para->filePath != NULL) {
+	  free(para->cosim->para->filePath);
+  }
   return 0;
 } // End of read_sci_input()
+
+/*
+		* Read the file to identify the block cells in space
+		*
+		* @param para Pointer to FFD parameters
+		* @param var Pointer to FFD simulation variables
+		* @param BINDEX Pointer to boundary index
+		*
+		* @return 0 if no error occurred
+		*/
+int read_sci_zeroone(PARA_DATA* para, REAL** var, int** BINDEX) {
+	int i, j, k;
+	int delcount = 0;
+	int mark;
+	int imax = para->geom->imax;
+	int jmax = para->geom->jmax;
+	int kmax = para->geom->kmax;
+	int index = para->geom->index;
+	int IMAX = imax + 2, IJMAX = (imax + 2) * (jmax + 2);
+	REAL* flagp = var[FLAGP];
+
+	if ((file_params = fopen(para->inpu->block_file_name, "r")) == NULL) {
+		sprintf(msg, "read_sci_input():Could not open file \"%s\"!\n",
+			para->inpu->block_file_name);
+		ffd_log(msg, FFD_ERROR);
+		return 1;
+	}
+
+	sprintf(msg, "read_sci_input(): start to read block information from \"%s\".",
+		para->inpu->block_file_name);
+	ffd_log(msg, FFD_NORMAL);
+
+	for (k = 1;k <= kmax;k++)
+		for (j = 1;j <= jmax;j++)
+			for (i = 1;i <= imax;i++) {
+				fscanf(file_params, "%d", &mark);
+
+				/* mark=1 block cell;mark=0 fluid cell*/
+
+				if (mark == 1) {
+					flagp[IX(i, j, k)] = SOLID;
+					BINDEX[0][index] = i;
+					BINDEX[1][index] = j;
+					BINDEX[2][index] = k;
+					index++;
+				}
+				delcount++;
+
+				if (delcount == 25) {
+					fscanf(file_params, "\n");
+					delcount = 0;
+				}
+			}
+
+	fclose(file_params);
+	para->geom->index = index;
+
+	sprintf(msg, "read_sci_input(): end of reading zeroone.dat.");
+	ffd_log(msg, FFD_NORMAL);
+
+	return 0;
+} /* End of read_sci_zeroone()*/
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

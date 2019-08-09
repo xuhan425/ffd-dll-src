@@ -36,6 +36,9 @@ int FFD_solver(PARA_DATA *para, REAL **var, int **BINDEX) {
   double t_cosim;
   int flag, next, bar=0;
 
+  if (para->solv->cosimulation == 1)
+	  t_cosim = para->mytime->t + para->cosim->modelica->dt;
+
 		// check the number of tiles in input file
 		//if (check_num_tiles(&para, var, BINDEX)>0) hasTile = 1;
 		hasTile = 0;
@@ -77,36 +80,164 @@ int FFD_solver(PARA_DATA *para, REAL **var, int **BINDEX) {
 
     timing(para);
 
-    // log the imbalance of energy
-    if (para->solv->check_conservation)CheckImbalance(para, var, TEMP, BINDEX);
+	// log the imbalance of energy
+	if (para->solv->check_conservation)CheckImbalance(para, var, TEMP, BINDEX);
 
-    if(para->outp->version==DEBUG)
-      ffd_log("FFD_solver(): Single Simulation, prepare for next time step",
-              FFD_NORMAL);
+	/*-------------------------------------------------------------------------*/
+   /* Process for Coupled simulation*/
+   /*-------------------------------------------------------------------------*/
+	if (para->solv->cosimulation == 1) {
+		/*.......................................................................
+		| Condition 1: If synchronization point is reached,
+		| Action:     Do data exchange
+		.......................................................................*/
+		if (fabs(para->mytime->t - t_cosim) < SMALL) {
+			if (para->outp->version == DEBUG)
+				ffd_log("FFD_solver(): Coupled simulation, reached synchronization point",
+					FFD_NORMAL);
 
-    // Start to record data for calculating mean velocity if needed
-    if(para->mytime->t>t_steady && para->outp->cal_mean==0) {
-      para->outp->cal_mean = 1;
-      flag = reset_time_averaged_data(para, var);
-      if(flag != 0) {
-        ffd_log("FFD_solver(): Could not reset averaged data.",
-          FFD_ERROR);
-        return flag;
-      }
-      else
-        ffd_log("FFD_solver(): Start to calculate mean properties.",
-                 FFD_NORMAL);
-    }
+			/* Average the FFD simulation data*/
+			flag = average_time(para, var);
+			if (flag != 0) {
+				ffd_log("FFD_solver(): Could not average the data over time.",
+					FFD_ERROR);
+				return flag;
+			}
 
-    if(para->outp->cal_mean==1) {
-      flag = add_time_averaged_data(para, var);
-      if(flag != 0) {
-        ffd_log("FFD_solver(): Could not add the averaged data.",
-          FFD_ERROR);
-        return 1;
-      }
-    }
-    next = para->mytime->step_current < step_total ? 1 : 0;
+			/*.......................................................................
+			| Check if Modelica asks to stop the simulation
+			.......................................................................*/
+			if (para->cosim->para->flag == 0) {
+				/* Stop the solver*/
+				next = 0;
+				sprintf(msg,
+					"ffd_solver(): Received stop command from Modelica at "
+					"FFD time: %f[s], Modelica Time: %f[s].",
+					para->mytime->t, para->cosim->modelica->t);
+				ffd_log(msg, FFD_NORMAL);
+			}
+			else {
+				/* the data for coupled simulation*/
+				flag = read_cosim_data(para, var, BINDEX);
+				if (flag != 0) {
+					ffd_log("FFD_solver(): Could not read coupled simulation data.", FFD_ERROR);
+					return flag;
+				}
+			}
+			/*.......................................................................
+			| Check if Modelica asks to stop the simulation
+			.......................................................................*/
+			if (para->cosim->para->flag == 0) {
+				/* Stop the solver*/
+				next = 0;
+				sprintf(msg,
+					"ffd_solver(): Received stop command from Modelica at "
+					"FFD time: %f[s], Modelica Time: %f[s].",
+					para->mytime->t, para->cosim->modelica->t);
+				ffd_log(msg, FFD_NORMAL);
+			}
+			else {
+				flag = write_cosim_data(para, var);
+				if (flag != 0) {
+					ffd_log("FFD_solver(): Could not write coupled simulation data.", FFD_ERROR);
+					return flag;
+				}
+				sprintf(msg, "ffd_solver(): Synchronized data at t=%f[s]\n", para->mytime->t);
+				ffd_log(msg, FFD_NORMAL);
+			}
+			/* Set the next synchronization time*/
+			t_cosim += para->cosim->modelica->dt;
+			/* Reset all the averaged data to 0*/
+			flag = reset_time_averaged_data(para, var);
+			if (flag != 0) {
+				ffd_log("FFD_solver(): Could not reset averaged data.",
+					FFD_ERROR);
+				return flag;
+			}
+
+			continue;
+		} /* End of Condition 1*/
+		/*.......................................................................
+		| Condition 2: synchronization point is not reached ,
+		|             but already miss the synchronization point
+		| Action:     Stop simulation
+		.......................................................................*/
+		else if (para->mytime->t - t_cosim > SMALL) {
+			sprintf(msg,
+				"ffd_solver(): Mis-matched synchronization step with "
+				"t_ffd=%f[s], t_cosim=%f[s], dt_syn=%f[s], dt_ffd=%f[s].",
+				para->mytime->t, t_cosim,
+				para->cosim->modelica->dt, para->mytime->dt);
+			ffd_log(msg, FFD_ERROR);
+			sprintf(msg, "para->mytime->t - t_cosim=%lf", para->mytime->t - t_cosim);
+			ffd_log(msg, FFD_ERROR);
+			return 1;
+		} /* end of Condition 2*/
+		/*.......................................................................
+		| Condition 3: synchronization point is not reached
+		|             and not miss the synchronization point
+		| Action:     Do FFD internal simulation and add data for future average
+		.......................................................................*/
+		else {
+			if (para->outp->version == DEBUG)
+				ffd_log("FFD_solver(): Coupled simulation, prepare next step for FFD",
+					FFD_NORMAL);
+
+			/* Integrate the data on the boundary surface*/
+			flag = surface_integrate(para, var, BINDEX);
+			if (flag != 0) {
+				ffd_log("FFD_solver(): "
+					"Could not average the data on boundary.",
+					FFD_ERROR);
+				return flag;
+			}
+			else if (para->outp->version == DEBUG)
+				ffd_log("FFD_solver(): completed surface integration",
+					FFD_NORMAL);
+
+			flag = add_time_averaged_data(para, var);
+			if (flag != 0) {
+				ffd_log("FFD_solver(): "
+					"Could not add the averaged data.",
+					FFD_ERROR);
+				return flag;
+			}
+			else if (para->outp->version == DEBUG)
+				ffd_log("FFD_solver(): completed time average",
+					FFD_NORMAL);
+
+		} /* End of Condition 3*/
+	} /* End of coupled simulation*/
+	
+	else {
+		if (para->outp->version == DEBUG)
+			ffd_log("FFD_solver(): Single Simulation, prepare for next time step",
+				FFD_NORMAL);
+
+		// Start to record data for calculating mean velocity if needed
+		if (para->mytime->t > t_steady && para->outp->cal_mean == 0) {
+			para->outp->cal_mean = 1;
+			flag = reset_time_averaged_data(para, var);
+			if (flag != 0) {
+				ffd_log("FFD_solver(): Could not reset averaged data.",
+					FFD_ERROR);
+				return flag;
+			}
+			else
+				ffd_log("FFD_solver(): Start to calculate mean properties.",
+					FFD_NORMAL);
+		}
+
+		if (para->outp->cal_mean == 1) {
+			flag = add_time_averaged_data(para, var);
+			if (flag != 0) {
+				ffd_log("FFD_solver(): Could not add the averaged data.",
+					FFD_ERROR);
+				return 1;
+			}
+		}
+		next = para->mytime->step_current < step_total ? 1 : 0;
+	}
   } // End of While loop
   return flag;
 } // End of FFD_solver( )

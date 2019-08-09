@@ -18,9 +18,21 @@
 #define _DATA_STRUCTURE_H
 #endif
 #ifdef _MSC_VER
-#include <windows.h>
+	#include <windows.h>
+#elif defined __GNUC__
+	#ifdef _WIN64
+		#include <windows.h>
+	#elif _WIN32
+		#include <windows.h>
+	#elif __APPLE__
+		#include <unistd.h>
+	#elif __linux__
+		#include <unistd.h>
+	#else
+		#include <unistd.h>
+	#endif
 #else
-#include <unistd.h>
+	#include <unistd.h>
 #endif
 
 #include <stdio.h>
@@ -69,6 +81,9 @@ Place the stdlib.h line above the glut.h line in the code.
 #define END_FOR }}}
 
 #define SMALL 0.00001
+#define SUCCESS 0
+#define FAILURE 1
+#define MAX_SOURCE_SIZE (0x100000)
 
 #ifndef max
 	#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
@@ -166,7 +181,7 @@ typedef enum{NOSLIP, SLIP, INFLOW, OUTFLOW, PERIODIC, SYMMETRY} BCTYPE;
 
 typedef enum{TCONST, QCONST, ADIBATIC} BCTTYPE;
 
-typedef enum{GS, TDMA} SOLVERTYPE;
+typedef enum{GS, TDMA, JACOBI} SOLVERTYPE;
 
 typedef enum{SEMI, LAX, UPWIND, UPWIND_NEW, CENTRAL} ADVECTION;
 

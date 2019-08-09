@@ -65,6 +65,7 @@ FILE *file_params;
 ///////////////////////////////////////////////////////////////////////////////
 int read_sci_max(PARA_DATA *para, REAL **var);
 
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Check the number of racks in the input file
 ///
@@ -98,6 +99,17 @@ int check_num_tiles(PARA_DATA *para, REAL **var, int **BINDEX);
 ///\return 0 if no error occurred
 ///////////////////////////////////////////////////////////////////////////////
 int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX);
+
+/*
+	* Read the file to identify the block cells in space
+	*
+	* @param para Pointer to FFD parameters
+	* @param var Pointer to FFD simulation variables
+	* @param BINDEX Pointer to boundary index
+	*
+	* @return 0 if no error occurred
+	*/
+int read_sci_zeroone(PARA_DATA *para, REAL **var, int **BINDEX);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Identify the properties of cells

@@ -22,6 +22,7 @@
 	*/
 
 #include "cosimulation.h"
+#include <stdio.h>
 
 /*
 	* Read the coupled simulation parameters defined by Modelica
@@ -561,6 +562,8 @@ int compare_boundary_names(PARA_DATA *para) {
           "compare_boundary_names(): Modelica has the same name \"%s\" for two BCs.",
           name3[i]);
           ffd_log(msg, FFD_ERROR);
+
+		  //printf();
           return 1;
         }
         /* If no same name has been found before, use it*/

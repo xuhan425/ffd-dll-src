@@ -269,7 +269,7 @@ int bounary_area(PARA_DATA *para, REAL **var, int **BINDEX) {
     }
   } // End of for(it=0; it<index; it++)
 
-  ffd_log("bounary_area(): Calculated surface area for FFD boundaries are:",
+  ffd_log("boundary_area(): Calculated surface area for FFD boundaries are:",
     FFD_NORMAL);
 
   if(para->bc->nb_wall>0) {

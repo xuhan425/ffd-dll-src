@@ -151,13 +151,16 @@ int ffd(int cosimulation) {
   para.solv   = &solv;
   para.sens   = &sens;
   para.init   = &init;
+  /* Stand alone simulation: 0; Cosimulaiton: 1*/
+  para.solv->cosimulation = cosimulation;
+
 
   if(initialize(&para)!=0) {
     ffd_log("ffd(): Could not initialize simulation parameters.", FFD_ERROR);
     return 1;
   }
 
-  // Overwrite the mesh and simulation data using SCI generated file
+  /* Overwrite the mesh and simulation data using SCI generated file */
   if(para.inpu->parameter_file_format == SCI) {
     if(read_sci_max(&para, var)!=0) {
       ffd_log("ffd(): Could not read SCI data.", FFD_ERROR);
@@ -183,8 +186,8 @@ int ffd(int cosimulation) {
   ffd_log("ffd.c: Start FFD solver.", FFD_NORMAL);
   //write_tecplot_data(&para, var, "initial");
 
-  para.mytime->t_start = clock();
-  //printf ("the time start simulation is %lf\n", para.mytime->t_start);
+  //para.mytime->t_start = clock();
+	//printf ("the time start simulation is %lf\n", para.mytime->t_start);
 
   /// Launch FFD core
   if(FFD_solver(&para, var, BINDEX)!=0) {
@@ -198,12 +201,12 @@ int ffd(int cosimulation) {
   // Calculate mean value
   if(para.outp->cal_mean == 1)
     average_time(&para, var);
-  /*
+  
   if(write_unsteady(&para, var, "unsteady")!=0) {
     ffd_log("FFD_solver(): Could not write the file unsteady.plt.", FFD_ERROR);
     return 1;
   }
-  */
+  
 		//write_vtk_data(&para, var, "result");
 		
 		if (para.outp->result_file == VTK) {
@@ -217,17 +220,23 @@ int ffd(int cosimulation) {
 			//write_tecplot_all_data(&para, var, "result_all");
 		}
 
-  /*
-  if(para.outp->version == RUN)
-    write_tecplot_all_data(&para, var, "result_all");
+  
+  /*if(para.outp->version == RUN)
+    write_tecplot_all_data(&para, var, "result_all");*/
 
   // Write the data in SCI format
   write_SCI(&para, var, "output");
-  */
+  
 
   // Free the memory
   free_data(var);
   free_index(BINDEX);
+
+  /* Inform Modelica the stopping command has been received*/
+  if (para.solv->cosimulation == 1) {
+	  para.cosim->para->flag = 2;
+	  ffd_log("ffd(): Sent stopping signal to Modelica", FFD_NORMAL);
+  }
 
   return 0;
 } // End of ffd( )

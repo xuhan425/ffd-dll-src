@@ -251,6 +251,12 @@ int set_initial_data(PARA_DATA *para, REAL **var, int **BINDEX) {
       ffd_log(msg, FFD_ERROR);
       return flag;
     }
+	flag = read_sci_zeroone(para, var, BINDEX);
+	if (flag != 0) {
+		ffd_log("set_inital_data(): Could not read block information file",
+			FFD_ERROR);
+		return flag;
+	}
 
     // mark the cells
     mark_cell(para, var, BINDEX);
@@ -259,21 +265,20 @@ int set_initial_data(PARA_DATA *para, REAL **var, int **BINDEX) {
   /****************************************************************************
   | Allocate memory for sensor data if there is at least one sensor
   ****************************************************************************/
-  if(para->sens->nb_sensor>0) {
-  para->sens->senVal = (REAL *) malloc(para->sens->nb_sensor*sizeof(REAL));
-  if(para->sens->senVal==NULL) {
-    ffd_log("set_initial_data(): Could not allocate memory for "
-      "para->sens->senVal", FFD_ERROR);
-    return -1;
+  if (para->sens->nb_sensor > 0) {
+	  para->sens->senVal = (REAL*)malloc(para->sens->nb_sensor * sizeof(REAL));
+	  if (para->sens->senVal == NULL) {
+		  ffd_log("set_initial_data(): Could not allocate memory for "
+			  "para->sens->senVal", FFD_ERROR);
+		  return -1;
+	  }
+	  para->sens->senValMean = (REAL*)malloc(para->sens->nb_sensor * sizeof(REAL));
+	  if (para->sens->senValMean == NULL) {
+		  ffd_log("set_initial_data(): Could not allocate memory for "
+			  "para->sens->senValMean", FFD_ERROR);
+		  return 1;
+	  }
   }
-  para->sens->senValMean = (REAL *) malloc(para->sens->nb_sensor*sizeof(REAL));
-  if(para->sens->senValMean==NULL) {
-    ffd_log("set_initial_data(): Could not allocate memory for "
-      "para->sens->senValMean", FFD_ERROR);
-    return 1;
-  }
-  }
-
   /****************************************************************************
   | Allocate memory for Species
   ****************************************************************************/
@@ -385,8 +390,124 @@ int set_initial_data(PARA_DATA *para, REAL **var, int **BINDEX) {
   flag = reset_time_averaged_data(para, var);
   if(flag != 0) {
   ffd_log("FFD_solver(): Could not reset averaged data.",
-    FFD_ERROR);
+	FFD_ERROR);
   return flag;
+  }
+
+  /****************************************************************************
+  | Conduct the data exchange at the initial state of cosimulation
+  ****************************************************************************/
+  if (para->solv->cosimulation == 1) {
+	  /*------------------------------------------------------------------------
+	  | Calculate the area of boundary
+	  ------------------------------------------------------------------------*/
+	  flag = bounary_area(para, var, BINDEX);
+	  if (flag != 0) {
+		  ffd_log("set_initial_data(): Could not get the boundary area.",
+			  FFD_ERROR);
+		  return flag;
+	  }
+	  /*------------------------------------------------------------------------
+	  | Read the cosimulation parameter data (Only need once)
+	  ------------------------------------------------------------------------*/
+	  flag = read_cosim_parameter(para, var, BINDEX);
+	  if (flag != 0) {
+		  ffd_log("set_initial_data(): Could not read cosimulation parameters.",
+			  FFD_ERROR);
+		  return 1;
+	  }
+	  /*------------------------------------------------------------------------
+	  | Read the cosimulation data
+	  ------------------------------------------------------------------------*/
+	  flag = read_cosim_data(para, var, BINDEX);
+	  if (flag != 0) {
+		  ffd_log("set_initial_data(): Could not read initial data for "
+			  "cosimulaiton.", FFD_ERROR);
+		  return flag;
+	  }
+
+	  /*------------------------------------------------------------------------
+	  | Perform the simulation for one step to update the FFD initial condition
+	  ------------------------------------------------------------------------*/
+
+	  flag = vel_step(para, var, BINDEX);
+	  if (flag != 0) {
+		  ffd_log("FFD_solver(): Could not solve velocity.", FFD_ERROR);
+		  return flag;
+	  }
+	  else if (para->outp->version == DEBUG)
+		  ffd_log("FFD_solver(): solved velocity step.", FFD_NORMAL);
+
+
+
+	  flag = temp_step(para, var, BINDEX);
+	  if (flag != 0) {
+		  ffd_log("FFD_solver(): Could not solve temperature.", FFD_ERROR);
+		  return flag;
+	  }
+	  else if (para->outp->version == DEBUG)
+		  ffd_log("FFD_solver(): solved temperature step.", FFD_NORMAL);
+
+	  flag = den_step(para, var, BINDEX);
+	  if (flag != 0) {
+		  ffd_log("FFD_solver(): Could not solve trace substance.", FFD_ERROR);
+		  return flag;
+	  }
+	  else if (para->outp->version == DEBUG)
+		  ffd_log("FFD_solver(): solved density step.", FFD_NORMAL);
+
+	  /* Integrate the data on the boundary surface*/
+	  flag = surface_integrate(para, var, BINDEX);
+	  if (flag != 0) {
+
+
+		  ffd_log("FFD_solver(): "
+			  "Could not average the data on boundary.",
+			  FFD_ERROR);
+		  return flag;
+	  }
+	  else if (para->outp->version == DEBUG)
+		  ffd_log("FFD_solver(): completed surface integration",
+			  FFD_NORMAL);
+
+	  flag = add_time_averaged_data(para, var);
+	  if (flag != 0) {
+		  ffd_log("FFD_solver(): "
+			  "Could not add the averaged data.",
+			  FFD_ERROR);
+		  return flag;
+
+	  }
+	  else if (para->outp->version == DEBUG)
+		  ffd_log("FFD_solver(): completed time average",
+			  FFD_NORMAL);
+
+	  /* Average the FFD simulation data*/
+	  flag = average_time(para, var);
+	  if (flag != 0) {
+		  ffd_log("FFD_solver(): Could not average the data over time.",
+			  FFD_ERROR);
+		  return flag;
+
+
+
+	  }
+
+
+
+
+	  /*------------------------------------------------------------------------
+	  | Write the cosimulation data
+	  ------------------------------------------------------------------------*/
+	  flag = write_cosim_data(para, var);
+	  if (flag != 0) {
+		  ffd_log("set_initial_data(): Could not write initial data for "
+			  "cosimulaiton.", FFD_ERROR);
+		  return flag;
+
+
+
+	  }
   }
 
   return flag;

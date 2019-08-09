@@ -56,6 +56,15 @@
 #include "initialization.h"
 #endif
 
+/*
+* Assign the parameter for coupled simulation
+*
+* @para cosim Pointer to the coupled simulation parameters
+*
+* @return 0 if no error occurred
+*/
+int ffd_cosimulation(CosimulationData * cosim);
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Main routine of FFD
 ///
