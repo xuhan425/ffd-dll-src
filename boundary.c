@@ -1056,7 +1056,7 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
   } // End of for() loop for go through the index
 
   return 0;
-} // End of set_bnd_temp()
+} // End of set_bnd_temp()*/
 
   ///////////////////////////////////////////////////////////////////////////////
   /// Set the boundary condition for temperature in advection solved by implicit scheme
@@ -1534,7 +1534,45 @@ REAL adjust_velocity(PARA_DATA *para, REAL **var, int **BINDEX) {
 ///
 /// Last update: 7/7/2017, by Wei Tian, @ Schneider Electric
 ///////////////////////////////////////////////////////////////////////////////
-REAL h_coef(PARA_DATA *para, REAL **var, int i, int j, int k, REAL D) {
+REAL h_coef(PARA_DATA* para, REAL** var, int i, int j, int k, REAL D) {
+	REAL h, kapa;
+	REAL nu = para->prob->nu;
+
+
+
+	switch (para->prob->tur_model) {
+	case LAM:
+		kapa = nu;
+		break;
+	case CONSTANT:
+		kapa = (REAL)101.0 * nu;
+		break;
+	case CHEN:
+		kapa = nu + nu_t_chen_zero_equ(para, var, i, j, k);
+		break;
+	default:
+		sprintf(msg, "h_coef(): Value (%d) for para->prob->tur_model"
+			"was not correct.", para->prob->tur_model);
+		ffd_log(msg, FFD_ERROR);
+	}
+	h = para->prob->Cp * para->prob->rho * para->prob->alpha * kapa
+		/ (nu * D);
+
+
+	return h;
+
+
+
+
+
+
+
+
+
+
+
+} /* End of h_coef()*/
+/*REAL h_coef(PARA_DATA *para, REAL **var, int i, int j, int k, REAL D) {
   REAL h, kapa;
   REAL nu = para->prob->nu;
   REAL rhoCp = para->prob->rho * para->prob->Cp;
@@ -1569,4 +1607,4 @@ REAL h_coef(PARA_DATA *para, REAL **var, int i, int j, int k, REAL D) {
   else
     return coef_h*rhoCp;
 
-} // End of h_coef()
+} // End of h_coef()*/
