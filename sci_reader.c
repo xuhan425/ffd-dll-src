@@ -234,7 +234,7 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
   delz[0]=0;
 
   // Read cell dimensions in X, Y, Z directions
-  /*if (ifDouble) {
+  if (ifDouble) {
     for (i = 1; i <= imax; i++) fscanf(file_params, "%lf", &delx[i]);
     fscanf(file_params, "\n");
     for (j = 1; j <= jmax; j++) fscanf(file_params, "%lf", &dely[j]);
@@ -249,14 +249,9 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
     fscanf(file_params, "\n");
     for (k = 1; k <= kmax; k++) fscanf(file_params, "%f", &delz[k]);
     fscanf(file_params, "\n");
-  }*/
+  }
 
-  for (i = 1; i <= imax; i++) fscanf(file_params, "%lf", &delx[i]);
-  fscanf(file_params, "\n");
-  for (j = 1; j <= jmax; j++) fscanf(file_params, "%lf", &dely[j]);
-  fscanf(file_params, "\n");
-  for (k = 1; k <= kmax; k++) fscanf(file_params, "%lf", &delz[k]);
-  fscanf(file_params, "\n");
+  
 
   // Store the locations of grid cell surfaces
   tempx = 0.0; tempy = 0.0; tempz = 0.0;
@@ -374,16 +369,15 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
       | Get the boundary conditions
       .......................................................................*/
       fgets(string, 400, file_params);
-	  sscanf(string, "%d%d%d%d%d%d%lf%lf%lf%lf%lf", &SI, &SJ, &SK, &EI,
-		  &EJ, &EK, &TMP, &MASS, &U, &V, &W);
-      /*if (ifDouble) {
+	  
+      if (ifDouble) {
         sscanf(string, "%d%d%d%d%d%d%lf%lf%lf%lf%lf", &SI, &SJ, &SK, &EI,
           &EJ, &EK, &TMP, &MASS, &U, &V, &W);
       }
       else {
         sscanf(string, "%d%d%d%d%d%d%f%f%f%f%f", &SI, &SJ, &SK, &EI,
           &EJ, &EK, &TMP, &MASS, &U, &V, &W);
-      }*/
+      }
       sprintf(msg, "read_sci_input(): VX=%f, VY=%f, VZ=%f, T=%f, Xi=%f",
               U, V, W, TMP, MASS);
       ffd_log(msg, FFD_NORMAL);
@@ -964,6 +958,7 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
         sscanf(string, "%d%d%d%d%d%d%d%f", &SI, &SJ, &SK, &EI, &EJ, &EK,
           &FLTMP, &TMP);
       }
+	  
       sprintf(msg, "ThermalBC=%d, T/q_dot=%f", FLTMP, TMP);
       ffd_log(msg, FFD_NORMAL);
 
