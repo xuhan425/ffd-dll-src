@@ -43,7 +43,7 @@
 
 #ifndef REAL
 #define REAL float
-#define ifDouble 0/*index to show it is double*/
+#define ifDouble 1/*index to show it is double*/
 #endif
 
 #ifndef _MODELICA_FFD_COMMON_H
