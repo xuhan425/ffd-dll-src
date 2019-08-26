@@ -305,7 +305,7 @@ int coef_diff(PARA_DATA *para, REAL **var, REAL *psi, REAL *psi0,
       END_FOR
 
 		  /* Add the source terms*/
-		  source_diff(para, var, var_type, index);
+		  //source_diff(para, var, var_type, index);
 
       // Set boundary conditions
       set_bnd(para, var, var_type, index, psi, BINDEX);
@@ -316,7 +316,7 @@ int coef_diff(PARA_DATA *para, REAL **var, REAL *psi, REAL *psi0,
       END_FOR
 
       // Add the source terms
-      //source_diff(para, var, var_type, index);
+      source_diff(para, var, var_type, index);
 
       break;
     default:
