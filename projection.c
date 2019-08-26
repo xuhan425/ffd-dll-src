@@ -85,7 +85,7 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
   
   // solve equations
   if (para->solv->solver == GS) {
-    GS_itr(para, var, p, flagp, num_swipe);
+    Gauss_Seidel(para, var, p, flagp, num_swipe);
     }
   else {
     Jacobi(para, var, p, flagp, num_swipe);
