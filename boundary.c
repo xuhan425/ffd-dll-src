@@ -86,7 +86,7 @@ int set_bnd(PARA_DATA *para, REAL **var, int var_type, int index, REAL *psi,
   }
 
   return flag;
-} // End of set_bnd()
+} // End of set_bnd()*/
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -751,6 +751,8 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
   REAL h;
   REAL D = 0.0;
   REAL *flagp = var[FLAGP];
+  REAL rhoCp_1 = 1 / (para->prob->rho * para->prob->Cp);
+  //REAL awtemp;
 
   /****************************************************************************
   | Go through all the boundary cells
@@ -784,7 +786,19 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
           if(flagp[IX(i+1,j,k)]==FLUID) {
             D = 0.5f * length_x(para,var,i+1,j,k);
             h = h_coef(para,var,i+1,j,k,D);
-            aw[IX(i+1,j,k)] = h * ayz/(para->prob->rho*para->prob->Cp);
+			//aw[IX(i + 1, j, k)] = h * ayz / (para->prob->rho * para->prob->Cp);
+			aw[IX(i + 1, j, k)] = h * rhoCp_1 * ayz;
+			//aw[IX(i + 1, j, k)] = h * ayz * rhoCp_1;
+            /*awtemp = h * ayz * rhoCp_1;
+			if (fabs(10000000000.0*aw[IX(i + 1, j, k)] - 10000000000.0*awtemp) <= .0000000000072755) {
+				awtemp = h * ayz / (para->prob->rho * para->prob->Cp);
+			}
+			else {
+				sprintf(msg, "old: %lf, new: %lf",
+					10000000000.0 * aw[IX(i + 1, j, k)], 10000000000.0 * awtemp);
+				ffd_log(msg, FFD_NORMAL);
+			}*/
+
             //printf("h and aw are %f\t%f\n", h, aw[IX(i + 1, j, k)]);
             qflux[IX(i,j,k)] = h * (psi[IX(i+1,j,k)]-psi[IX(i,j,k)]);
           }
@@ -794,7 +808,9 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
           if(flagp[IX(i-1,j,k)]==FLUID) {
             D = 0.5f * length_x(para,var,i-1,j,k);
             h = h_coef(para,var,i-1,j,k,D);
-            ae[IX(i-1,j,k)] = h* ayz / (para->prob->rho*para->prob->Cp);
+            //ae[IX(i-1,j,k)] = h* ayz / (para->prob->rho*para->prob->Cp);
+			ae[IX(i - 1, j, k)] = h * rhoCp_1 * ayz;
+			//ae[IX(i - 1, j, k)] = h * ayz * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i-1,j,k)]-psi[IX(i,j,k)]);
           }
         } // End of else if(i==imax+1)
@@ -804,14 +820,18 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
           if(flagp[IX(i+1,j,k)]==FLUID) {
             D = 0.5f * length_x(para,var,i+1,j,k);
             h = h_coef(para,var,i+1,j,k,D);
-            aw[IX(i+1,j,k)] = h * ayz / (para->prob->rho*para->prob->Cp);
+            //aw[IX(i+1,j,k)] = h * ayz / (para->prob->rho*para->prob->Cp);
+			aw[IX(i + 1, j, k)] = h * rhoCp_1 * ayz;
+			//aw[IX(i + 1, j, k)] = h * ayz * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i+1,j,k)]-psi[IX(i,j,k)]);
           }
           // Western neighbor cell is fluid
           if(flagp[IX(i-1,j,k)]==FLUID) {
             D = 0.5f * length_x(para,var,i-1,j,k);
             h = h_coef(para,var,i-1,j,k,D);
-            ae[IX(i-1,j,k)] = h * ayz / (para->prob->rho*para->prob->Cp);
+            //ae[IX(i-1,j,k)] = h * ayz / (para->prob->rho*para->prob->Cp);
+			ae[IX(i - 1, j, k)] = h * rhoCp_1 * ayz;
+			//ae[IX(i - 1, j, k)] = h * ayz * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i-1,j,k)]-psi[IX(i,j,k)]);
           }
         } // End of 0<i<imax+1
@@ -820,7 +840,9 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
           if(flagp[IX(i,j+1,k)]==FLUID) {
             D = 0.5f * length_y(para,var,i,j+1,k);
             h = h_coef(para,var,i,j+1,k,D);
-            as[IX(i,j+1,k)] = h  * azx / (para->prob->rho*para->prob->Cp);
+            //as[IX(i,j+1,k)] = h  * azx / (para->prob->rho*para->prob->Cp);
+			as[IX(i, j + 1, k)] = h * rhoCp_1 * azx;
+			//as[IX(i, j + 1, k)] = h * azx * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i,j+1,k)]-psi[IX(i,j,k)]);
           }
         }
@@ -829,7 +851,9 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
           if(flagp[IX(i,j-1,k)]==FLUID) {
             D = 0.5f * length_y(para,var,i,j-1,k);
             h = h_coef(para,var,i,j-1,k,D);
-            an[IX(i,j-1,k)] = h  * azx / (para->prob->rho*para->prob->Cp);
+            //an[IX(i,j-1,k)] = h  * azx / (para->prob->rho*para->prob->Cp);
+			an[IX(i, j - 1, k)] = h * rhoCp_1 * azx;
+			//an[IX(i, j - 1, k)] = h * azx * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i,j-1,k)]-psi[IX(i,j,k)]);
           }
         }
@@ -839,14 +863,18 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
           if(flagp[IX(i,j-1,k)]==FLUID) {
             D = 0.5f * length_y(para,var,i,j-1,k);
             h = h_coef(para,var,i,j-1,k,D);
-            an[IX(i,j-1,k)] = h  * azx / (para->prob->rho*para->prob->Cp);
+            //an[IX(i,j-1,k)] = h  * azx / (para->prob->rho*para->prob->Cp);
+			an[IX(i, j - 1, k)] = h * rhoCp_1 * azx;
+			//an[IX(i, j - 1, k)] = h * azx * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i,j-1,k)]-psi[IX(i,j,k)]);
           }
           // Northern neighbor is fluid
           if(flagp[IX(i,j+1,k)]==FLUID) {
             D = 0.5f * length_y(para,var,i,j+1,k);
             h = h_coef(para,var,i,j+1,k,D);
-            as[IX(i,j+1,k)] = h  * azx / (para->prob->rho*para->prob->Cp);
+            //as[IX(i,j+1,k)] = h  * azx / (para->prob->rho*para->prob->Cp);
+			as[IX(i, j + 1, k)] = h * rhoCp_1 * azx;
+			//as[IX(i, j + 1, k)] = h * azx * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i,j+1,k)]-psi[IX(i,j,k)]);
           }
         }
@@ -855,7 +883,9 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
           if(flagp[IX(i,j,k+1)]==FLUID) {
             D = 0.5f * length_z(para,var,i,j,k+1);
             h = h_coef(para,var,i,j,k+1,D);
-            ab[IX(i,j,k+1)] = h * axy / (para->prob->rho*para->prob->Cp);
+            //ab[IX(i,j,k+1)] = h * axy / (para->prob->rho*para->prob->Cp);
+			ab[IX(i, j, k + 1)] = h * rhoCp_1 * axy;
+			//ab[IX(i, j, k + 1)] = h * axy * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i,j,k+1)]-psi[IX(i,j,k)]);
           }
         }
@@ -864,7 +894,9 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
           if(flagp[IX(i,j,k-1)]==FLUID) {
             D = 0.5f * length_z(para,var,i,j,k-1);
             h = h_coef(para,var,i,j,k-1,D);
-            af[IX(i,j,k-1)] = h * axy / (para->prob->rho*para->prob->Cp);
+            //af[IX(i,j,k-1)] = h * axy / (para->prob->rho*para->prob->Cp);
+			af[IX(i, j, k - 1)] = h * rhoCp_1 * axy;
+			//af[IX(i, j, k - 1)] = h * axy * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i,j,k-1)]-psi[IX(i,j,k)]);
           }
         }
@@ -874,14 +906,18 @@ int set_bnd_temp(PARA_DATA *para, REAL **var, int var_type, REAL *psi,
           if(flagp[IX(i,j,k+1)]==FLUID) {
             D = 0.5f * length_z(para,var,i,j,k+1);
             h = h_coef(para,var,i,j,k+1,D);
-            ab[IX(i,j,k+1)] = h  * axy / (para->prob->rho*para->prob->Cp);
+            //ab[IX(i,j,k+1)] = h  * axy / (para->prob->rho*para->prob->Cp);
+			ab[IX(i, j, k + 1)] = h * rhoCp_1 * axy;
+			//ab[IX(i, j, k + 1)] = h * axy * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i,j,k+1)]-psi[IX(i,j,k)]);
           }
           // Floor neighbor is fluid
           if(flagp[IX(i,j,k-1)]==FLUID) {
             D = 0.5f * length_z(para,var,i,j,k-1);
             h = h_coef(para,var,i,j,k-1,D);
-            af[IX(i,j,k-1)] = h  * axy / (para->prob->rho*para->prob->Cp);
+            //af[IX(i,j,k-1)] = h  * axy / (para->prob->rho*para->prob->Cp);
+			af[IX(i, j, k - 1)] = h * rhoCp_1 * axy;
+			//af[IX(i, j, k - 1)] = h * axy * rhoCp_1;
             qflux[IX(i,j,k)] = h * (psi[IX(i,j,k-1)]-psi[IX(i,j,k)]);
           }
         }
@@ -1534,7 +1570,45 @@ REAL adjust_velocity(PARA_DATA *para, REAL **var, int **BINDEX) {
 ///
 /// Last update: 7/7/2017, by Wei Tian, @ Schneider Electric
 ///////////////////////////////////////////////////////////////////////////////
-REAL h_coef(PARA_DATA *para, REAL **var, int i, int j, int k, REAL D) {
+REAL h_coef(PARA_DATA* para, REAL** var, int i, int j, int k, REAL D) {
+	REAL h, kapa;
+	REAL nu = para->prob->nu;
+
+
+
+	switch (para->prob->tur_model) {
+	case LAM:
+		kapa = nu;
+		break;
+	case CONSTANT:
+		kapa = (REAL)101.0 * nu;
+		break;
+	case CHEN:
+		kapa = nu + nu_t_chen_zero_equ(para, var, i, j, k);
+		break;
+	default:
+		sprintf(msg, "h_coef(): Value (%d) for para->prob->tur_model"
+			"was not correct.", para->prob->tur_model);
+		ffd_log(msg, FFD_ERROR);
+	}
+	h = para->prob->Cp * para->prob->rho * para->prob->alpha * kapa
+		/ (nu * D);
+
+
+	return h;
+
+
+
+
+
+
+
+
+
+
+
+} /* End of h_coef()*/
+/*REAL h_coef(PARA_DATA *para, REAL **var, int i, int j, int k, REAL D) {
   REAL h, kapa;
   REAL nu = para->prob->nu;
   REAL rhoCp = para->prob->rho * para->prob->Cp;
@@ -1569,4 +1643,4 @@ REAL h_coef(PARA_DATA *para, REAL **var, int i, int j, int k, REAL D) {
   else
     return coef_h*rhoCp;
 
-} // End of h_coef()
+} // End of h_coef()*/
