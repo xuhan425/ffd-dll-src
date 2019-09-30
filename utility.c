@@ -622,6 +622,7 @@ REAL qwall(PARA_DATA *para, REAL **var,int **BINDEX) {
 
 } // End of qwall()
 
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Free memory for BINDEX
 ///
