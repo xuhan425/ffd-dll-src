@@ -35,6 +35,8 @@ int FFD_solver(PARA_DATA *para, REAL **var, int **BINDEX) {
   REAL t_steady = para->mytime->t_steady;
   double t_cosim;
   int flag, next, bar=0;
+  int output_t = 9475;
+  char tmpName[10];
 
   if (para->solv->cosimulation == 1)
 	  t_cosim = para->mytime->t + para->cosim->modelica->dt;
@@ -48,6 +50,19 @@ int FFD_solver(PARA_DATA *para, REAL **var, int **BINDEX) {
   ***************************************************************************/
   next = 1;
   while(next==1) {
+	  if (para->outp->OutputDynamicFile == 1)
+		  if (fabs(para->mytime->t - output_t) < SMALL && para->mytime->t <= 9475 && para->mytime->t >= 9475) {
+			  sprintf(tmpName, "step%d", (int)(floor(para->mytime->t + 0.5)));
+			  if (write_vtk_data(para, var, tmpName) != 0) {
+				  ffd_log("FFD_solver(): Could not write the transient data.",
+					  FFD_ERROR);
+				  return 1;
+			  }
+			  sprintf(msg, "ffd_solver(): write transient data at t=%f[s]\n", para->mytime->t);
+			  ffd_log(msg, FFD_NORMAL);
+			  // output file every second
+			  output_t += 1;
+		  }
     // check the average temperature of fluid to calculate the energy conservation
     // need to have a vector to store the temperature for calculation of energy changing rate
     // Special note: the average temperature is NOT good for calculation of above item
@@ -382,6 +397,10 @@ int vel_step(PARA_DATA *para, REAL **var,int **BINDEX) {
   REAL *u0 = var[TMP1], *v0 = var[TMP2], *w0 = var[TMP3];
   REAL residual = 0.0;
   int flag = 0;
+  /*Cary debugging*/
+  int imax = para->geom->imax, jmax = para->geom->jmax;
+  int kmax = para->geom->kmax;
+  int IMAX = imax + 2, IJMAX = (imax + 2) * (jmax + 2);
 
   // Model tile
 		if (hasTile) {
@@ -438,6 +457,16 @@ int vel_step(PARA_DATA *para, REAL **var,int **BINDEX) {
     return flag;
   }
 
+  /*Cary debugging*/
+  /*sprintf(msg, "adv center of room u: %f", u[IX(imax / 2, jmax / 2, kmax / 2)]);
+  ffd_log(msg, FFD_NORMAL);
+
+  sprintf(msg, "adv center of room v: %f", v[IX(imax / 2, jmax / 2, kmax / 2)]);
+  ffd_log(msg, FFD_NORMAL);
+
+  sprintf(msg, "adv center of room w: %f", w[IX(imax / 2, jmax / 2, kmax / 2)]);
+  ffd_log(msg, FFD_NORMAL);*/
+
   // check residual after iterative solver
   if (para->solv->advection_solver == UPWIND && para->solv->check_residual == 1) {
     residual = check_residual(para, var, w0, var[FLAGW]);
@@ -477,6 +506,16 @@ int vel_step(PARA_DATA *para, REAL **var,int **BINDEX) {
     return flag;
   }
 
+  /*Cary debugging*/
+  /*sprintf(msg, "diff center of room u: %f", u[IX(imax / 2, jmax / 2, kmax / 2)]);
+  ffd_log(msg, FFD_NORMAL);
+
+  sprintf(msg, "diff center of room v: %f", v[IX(imax / 2, jmax / 2, kmax / 2)]);
+  ffd_log(msg, FFD_NORMAL);
+
+  sprintf(msg, "diff center of room w: %f", w[IX(imax / 2, jmax / 2, kmax / 2)]);
+  ffd_log(msg, FFD_NORMAL);*/
+
   // check residual after iterative solver
   if (para->solv->check_residual == 1) {
     residual = check_residual(para, var, w, var[FLAGW]);
@@ -489,6 +528,16 @@ int vel_step(PARA_DATA *para, REAL **var,int **BINDEX) {
     ffd_log("vel_step(): Could not project velocity.", FFD_ERROR);
     return flag;
   }
+
+  /*Cary debugging*/
+  /*sprintf(msg, "proj center of room u: %f", u[IX(imax / 2, jmax / 2, kmax / 2)]);
+  ffd_log(msg, FFD_NORMAL);
+
+  sprintf(msg, "proj center of room v: %f", v[IX(imax / 2, jmax / 2, kmax / 2)]);
+  ffd_log(msg, FFD_NORMAL);
+
+  sprintf(msg, "proj center of room w: %f", w[IX(imax / 2, jmax / 2, kmax / 2)]);
+  ffd_log(msg, FFD_NORMAL);*/
 
     // forced mass conservation function is NOT on after projection is Pressure-based correction is applied to tiles.
   if(para->bc->nb_outlet!=0 && para->solv->mass_conservation_on ==1) flag = mass_conservation(para, var,BINDEX);
