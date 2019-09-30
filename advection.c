@@ -17,9 +17,9 @@
 ///
 /// \date   6/16/2017
 ///
-/// This file provides functions that used for the advection step of FFD method.
-/// The advection starts with \c advect(). Then different subroutines are
-/// called according to the properties of the variables that are sorted by
+/// This file provides functions that are used for the advection step of the  
+/// FFD method. The advection starts with \c advect(). Then different subroutines
+/// are called according to the properties of the variables that are sorted by
 /// the location of variables assigned in the control volume.
 /// Velocities at X, Y and Z directions are located
 /// on the surface of the control volume. They are computed using
