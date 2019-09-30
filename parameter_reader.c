@@ -44,7 +44,12 @@ int assign_parameter(PARA_DATA *para, char *string) {
   }
 
   if (!strcmp(tmp, "geom.Lx")) {
-	  sscanf(string, "%s%lf", tmp, &para->geom->Lx);
+	  if (ifDouble) {
+		  sscanf(string, "%s%lf", tmp, &para->geom->Lx);
+	  }
+	  else {
+		  sscanf(string, "%s%f", tmp, &para->geom->Lx);
+	  }
 	  sprintf(msg, "assign_parameter(): %s=%f", tmp, para->geom->Lx);
 	  ffd_log(msg, FFD_NORMAL);
   }
@@ -217,6 +222,11 @@ int assign_parameter(PARA_DATA *para, char *string) {
 	sprintf(para->inpu->parameter_file_name, "%s%s", para->cosim->para->filePath, tmp_par);
     sprintf(msg, "assign_parameter(): %s=%s", tmp, para->inpu->parameter_file_name);
     ffd_log(msg, FFD_NORMAL);
+  }
+  else if (!strcmp(tmp, "outp.OutputDynamicFile")) {
+	sscanf(string, "%s%d", tmp, &para->outp->OutputDynamicFile);
+	sprintf(msg, "assign_parameter(): %s=%d", tmp, para->outp->OutputDynamicFile);
+	ffd_log(msg, FFD_NORMAL);
   }
   else if(!strcmp(tmp, "inpu.block_file_name")) {
     sscanf(string, "%s%s", tmp, tmp_par);
