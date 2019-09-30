@@ -88,7 +88,7 @@ int coef_diff(PARA_DATA *para, REAL **var, REAL *psi, REAL *psi0,
   REAL *pp = var[PP];
   REAL *Temp = var[TEMP];
   REAL dxe, dxw, dyn, dys, dzf, dzb, Dx, Dy, Dz;
-  REAL dt = para->mytime->dt, beta = para->prob->beta;
+  REAL dt = para->mytime->dt, t = para->mytime->t, beta = para->prob->beta;
   REAL Temp_Buoyancy = para->prob->Temp_Buoyancy;
   REAL gravx = para->prob->gravx, gravy = para->prob->gravy,
        gravz = para->prob->gravz;
@@ -224,6 +224,14 @@ int coef_diff(PARA_DATA *para, REAL **var, REAL *psi, REAL *psi0,
                      - beta*gravz*(Temp[IX(i,j,k)]-Temp_Buoyancy)*Dx*Dy*Dz
                      + (pp[IX(i,j,k)]-pp[IX(i ,j,k+1)])*Dy*Dx;
       END_FOR
+
+		/*Cary debugging*/
+		  if (para->mytime->t > 785.000 && para->mytime->t < 787.000) {
+			  sprintf(msg, "center of room b: %f", b[IX(imax/2, jmax/2, kmax/2)]);
+			  ffd_log(msg, FFD_NORMAL);
+		}
+
+
 
       set_bnd(para, var, var_type, index, psi, BINDEX);
       //set_bnd(para, var, var_type, psi, BINDEX);
