@@ -165,7 +165,8 @@ Place the stdlib.h line above the glut.h line in the code.
 #define RESX 65 // Resistance in X, i.e., tile, plastic curtain, etc.
 #define RESY 66 // Resistance source in Y, i.e., tile, plastic curtain, etc.
 #define RESZ 67 // Resistance source in Z, i.e., tile, plastic curtain, etc.
-#define C2BC 68  // Last variable
+#define C 68 // Cary debugging
+#define C2BC 69  // Last variable
 
 typedef enum{NOSLIP, SLIP, INFLOW, OUTFLOW, PERIODIC, SYMMETRY} BCTYPE;
 
@@ -254,6 +255,7 @@ typedef struct{
   int mouse_j; //mouse click located j
   int mouse_k; // mouse click located k
   RLT_FILE result_file; // result file type
+  int OutputDynamicFile; //determine if wants to determine the files for animation
 } OUTP_DATA;
 
 typedef struct {
