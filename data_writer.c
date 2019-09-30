@@ -194,8 +194,8 @@ int write_vtk_data(PARA_DATA *para, REAL **var, char *name) {
   int kmax = para->geom->kmax;
   int IMAX = imax + 2, IJMAX = (imax + 2) * (jmax + 2);
   REAL *x = var[X], *y = var[Y], *z = var[Z];
-  REAL *u = var[VXM], *v = var[VYM], *w = var[VZM], *p = var[IP];
-  REAL *T = var[TEMPM], *Xi = var[Xi1];
+  REAL *u = var[VX], *v = var[VY], *w = var[VZ], *p = var[IP];
+  REAL *T = var[TEMP], *Xi = var[Xi1];
   REAL *flagp = var[FLAGP];
   char *filename;
   FILE *datafile;
