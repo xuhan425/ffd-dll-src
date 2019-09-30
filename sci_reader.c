@@ -1473,7 +1473,7 @@ int read_sci_input(PARA_DATA *para, REAL **var, int **BINDEX) {
           para->mytime->step_total);
   ffd_log(msg, FFD_NORMAL);
 
-  //fgets(string, 400, file_params); //prandtl
+  fgets(string, 400, file_params); //prandtl
 
   /*****************************************************************************
   | Conclude the reading process
