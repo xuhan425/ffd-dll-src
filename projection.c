@@ -38,8 +38,9 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
   REAL *x = var[X], *y = var[Y], *z = var[Z];
   REAL *gx = var[GX], *gy = var[GY], *gz = var[GZ];
   REAL *u = var[VX], *v = var[VY], *w = var[VZ];
-  REAL *p = var[IP], *b = var[B], *ap = var[AP], *ab = var[AB], *af = var[AF];
+  REAL *p = var[IP], *b = var[B], *ap = var[AP], *ab = var[AB], *af = var[AF], *c = var[C]/*Cary debugging*/;
   REAL *ae = var[AE], *aw =var[AW], *an = var[AN], *as = var[AS];
+  REAL *T = var[TEMP]; //Cary debugging
   REAL dxe,dxw, dyn,dys,dzf,dzb,Dx,Dy,Dz;
   REAL *flagu = var[FLAGU],*flagv = var[FLAGV],*flagw = var[FLAGW];
   int num_swipe = para->solv->swipe_pro;
@@ -68,9 +69,17 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
     as[IX(i,j,k)] = Dx*Dz/dys;
     af[IX(i,j,k)] = Dx*Dy/dzf;
     ab[IX(i,j,k)] = Dx*Dy/dzb;
-    b[IX(i,j,k)] = rho*Dx*Dy*Dz/dt*((u[IX(i-1,j,k)]-u[IX(i,j,k)])/Dx
+    c[IX(i,j,k)] = /*rho**/Dx*Dy*Dz/dt*((u[IX(i-1,j,k)]-u[IX(i,j,k)])/Dx
                  + (v[IX(i,j-1,k)]-v[IX(i,j,k)])/Dy
                  + (w[IX(i,j,k-1)]-w[IX(i,j,k)])/Dz);
+
+	/*Cary debugging*/
+	/*if (i == imax / 2 && j == jmax / 2 && k == kmax / 2) {
+		sprintf(msg, "center of room b: %f", b[IX(i, j, k)]);
+		ffd_log(msg, FFD_NORMAL);
+	}*/
+	/*End of debugging*/
+
   END_FOR
 
   /****************************************************************************
@@ -85,7 +94,7 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
   
   // solve equations
   if (para->solv->solver == GS) {
-    Gauss_Seidel(para, var, p, flagp, num_swipe);
+    GS_itr(para, var, p, flagp, num_swipe);
     }
   else {
     Jacobi(para, var, p, flagp, num_swipe);
@@ -106,18 +115,42 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
   ****************************************************************************/
   FOR_U_CELL
     if (flagu[IX(i,j,k)]>=0) continue;
-    u[IX(i,j,k)] -= dt/rho*(p[IX(i+1,j,k)]-p[IX(i,j,k)]) / (x[IX(i+1,j,k)]-x[IX(i,j,k)]);
+    u[IX(i,j,k)] -= dt*(p[IX(i+1,j,k)]-p[IX(i,j,k)]) / (x[IX(i+1,j,k)]-x[IX(i,j,k)]);
+    //u[IX(i, j, k)] -= dt / rho * (p[IX(i + 1, j, k)] - p[IX(i, j, k)]) / (x[IX(i + 1, j, k)] - x[IX(i, j, k)]);
   END_FOR
 
   FOR_V_CELL
     if (flagv[IX(i,j,k)]>=0) continue;
-    v[IX(i,j,k)] -= dt/rho*(p[IX(i,j+1,k)]-p[IX(i,j,k)]) / (y[IX(i,j+1,k)]-y[IX(i,j,k)]);
+    v[IX(i,j,k)] -= dt*(p[IX(i,j+1,k)]-p[IX(i,j,k)]) / (y[IX(i,j+1,k)]-y[IX(i,j,k)]);
+    //v[IX(i, j, k)] -= dt / rho * (p[IX(i, j + 1, k)] - p[IX(i, j, k)]) / (y[IX(i, j + 1, k)] - y[IX(i, j, k)]);
   END_FOR
 
   FOR_W_CELL
     if (flagw[IX(i,j,k)]>=0) continue;
-    w[IX(i,j,k)] -= dt/rho*(p[IX(i,j,k+1)]-p[IX(i,j,k)]) / (z[IX(i,j,k+1)]-z[IX(i,j,k)]);
+    w[IX(i,j,k)] -= dt*(p[IX(i,j,k+1)]-p[IX(i,j,k)]) / (z[IX(i,j,k+1)]-z[IX(i,j,k)]);
+    //w[IX(i, j, k)] -= dt / rho * (p[IX(i, j, k + 1)] - p[IX(i, j, k)]) / (z[IX(i, j, k + 1)] - z[IX(i, j, k)]);
   END_FOR
+
+	/*sprintf(msg, "center of room u, v, w: %f, %f, %f", u[IX(imax/2, jmax/2, kmax/2)], v[IX(imax / 2, jmax / 2, kmax / 2)], w[IX(imax / 2, jmax / 2, kmax / 2)]);
+	ffd_log(msg, FFD_NORMAL);*/
+
+	/*sprintf(msg, "center of room x, y, z: %f, %f, %f", x[IX(imax / 2, jmax / 2, kmax / 2)], y[IX(imax / 2, jmax / 2, kmax / 2)], z[IX(imax / 2, jmax / 2, kmax / 2)]);
+	ffd_log(msg, FFD_NORMAL);
+
+	sprintf(msg, "center of room P: %f", p[IX(imax / 2, jmax / 2, kmax / 2)]);
+	ffd_log(msg, FFD_NORMAL);
+
+	sprintf(msg, "center of room T: %f", T[IX(imax / 2, jmax / 2, kmax / 2)]);
+	ffd_log(msg, FFD_NORMAL);
+
+	sprintf(msg, "center of room dP/dx: %f", (p[IX((imax/2)+1, jmax / 2, kmax / 2)] - p[IX(imax / 2, jmax / 2, kmax / 2)])/(x[IX((imax / 2) + 1, jmax / 2, kmax / 2)] - x[IX(imax / 2, jmax / 2, kmax / 2)]));
+	ffd_log(msg, FFD_NORMAL);
+
+	sprintf(msg, "center of room dP/dy: %f", (p[IX(imax / 2, (jmax / 2) + 1, kmax / 2)] - p[IX(imax / 2, jmax / 2, kmax / 2)]) / (y[IX((imax / 2) , (jmax / 2) + 1, kmax / 2)] - y[IX(imax / 2, jmax / 2, kmax / 2)]));
+	ffd_log(msg, FFD_NORMAL);
+
+	sprintf(msg, "center of room dP/dz: %f", (p[IX((imax / 2), jmax / 2, (kmax / 2) + 1)] - p[IX(imax / 2, jmax / 2, kmax / 2)]) / (z[IX((imax / 2) , jmax / 2, (kmax / 2) + 1)] - z[IX(imax / 2, jmax / 2, kmax / 2)]));
+	ffd_log(msg, FFD_NORMAL);*/
 
   /****************************************************************************
   | Check mass imbalance if needed
