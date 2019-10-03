@@ -226,10 +226,10 @@ int coef_diff(PARA_DATA *para, REAL **var, REAL *psi, REAL *psi0,
       END_FOR
 
 		/*Cary debugging*/
-		  if (para->mytime->t > 785.000 && para->mytime->t < 787.000) {
+		  /*if (para->mytime->t > 785.000 && para->mytime->t < 787.000) {
 			  sprintf(msg, "center of room b: %f", b[IX(imax/2, jmax/2, kmax/2)]);
 			  ffd_log(msg, FFD_NORMAL);
-		}
+		}*/
 
 
 
