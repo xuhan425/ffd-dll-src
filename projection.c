@@ -38,7 +38,7 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
   REAL *x = var[X], *y = var[Y], *z = var[Z];
   REAL *gx = var[GX], *gy = var[GY], *gz = var[GZ];
   REAL *u = var[VX], *v = var[VY], *w = var[VZ];
-  REAL *p = var[IP], *b = var[B], *ap = var[AP], *ab = var[AB], *af = var[AF], *c = var[C]/*Cary debugging*/;
+  REAL *p = var[IP], *b = var[B], *ap = var[AP], *ab = var[AB], *af = var[AF];
   REAL *ae = var[AE], *aw =var[AW], *an = var[AN], *as = var[AS];
   REAL *T = var[TEMP]; //Cary debugging
   REAL dxe,dxw, dyn,dys,dzf,dzb,Dx,Dy,Dz;
@@ -69,7 +69,7 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
     as[IX(i,j,k)] = Dx*Dz/dys;
     af[IX(i,j,k)] = Dx*Dy/dzf;
     ab[IX(i,j,k)] = Dx*Dy/dzb;
-    c[IX(i,j,k)] = /*rho**/Dx*Dy*Dz/dt*((u[IX(i-1,j,k)]-u[IX(i,j,k)])/Dx
+    b[IX(i,j,k)] = /*rho**/Dx*Dy*Dz/dt*((u[IX(i-1,j,k)]-u[IX(i,j,k)])/Dx
                  + (v[IX(i,j-1,k)]-v[IX(i,j,k)])/Dy
                  + (w[IX(i,j,k-1)]-w[IX(i,j,k)])/Dz);
 
