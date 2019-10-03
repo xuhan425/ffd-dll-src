@@ -165,8 +165,7 @@ Place the stdlib.h line above the glut.h line in the code.
 #define RESX 65 // Resistance in X, i.e., tile, plastic curtain, etc.
 #define RESY 66 // Resistance source in Y, i.e., tile, plastic curtain, etc.
 #define RESZ 67 // Resistance source in Z, i.e., tile, plastic curtain, etc.
-#define C 68 // Cary debugging
-#define C2BC 69  // Last variable
+#define C2BC 68  // Last variable
 
 typedef enum{NOSLIP, SLIP, INFLOW, OUTFLOW, PERIODIC, SYMMETRY} BCTYPE;
 
