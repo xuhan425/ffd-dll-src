@@ -35,7 +35,7 @@ int FFD_solver(PARA_DATA *para, REAL **var, int **BINDEX) {
   REAL t_steady = para->mytime->t_steady;
   double t_cosim;
   int flag, next, bar=0;
-  int output_t = 9475;
+  int output_t = 1038;
   char tmpName[10];
 
   if (para->solv->cosimulation == 1)
@@ -51,7 +51,7 @@ int FFD_solver(PARA_DATA *para, REAL **var, int **BINDEX) {
   next = 1;
   while(next==1) {
 	  if (para->outp->OutputDynamicFile == 1)
-		  if (fabs(para->mytime->t - output_t) < SMALL && para->mytime->t <= 9475 && para->mytime->t >= 9475) {
+		  if (fabs(para->mytime->t - output_t) < SMALL && para->mytime->t <= 1038 && para->mytime->t >= 1038) {
 			  sprintf(tmpName, "step%d", (int)(floor(para->mytime->t + 0.5)));
 			  if (write_vtk_data(para, var, tmpName) != 0) {
 				  ffd_log("FFD_solver(): Could not write the transient data.",
@@ -458,14 +458,14 @@ int vel_step(PARA_DATA *para, REAL **var,int **BINDEX) {
   }
 
   /*Cary debugging*/
-  /*sprintf(msg, "adv center of room u: %f", u[IX(imax / 2, jmax / 2, kmax / 2)]);
+  sprintf(msg, "adv center of room u: %f", u[IX(imax / 4, jmax / 2, kmax / 4)]);
   ffd_log(msg, FFD_NORMAL);
 
-  sprintf(msg, "adv center of room v: %f", v[IX(imax / 2, jmax / 2, kmax / 2)]);
+  sprintf(msg, "adv center of room v: %f", v[IX(imax / 4, jmax / 2, kmax / 4)]);
   ffd_log(msg, FFD_NORMAL);
 
-  sprintf(msg, "adv center of room w: %f", w[IX(imax / 2, jmax / 2, kmax / 2)]);
-  ffd_log(msg, FFD_NORMAL);*/
+  sprintf(msg, "adv center of room w: %f", w[IX(imax / 4, jmax / 2, kmax / 4)]);
+  ffd_log(msg, FFD_NORMAL);
 
   // check residual after iterative solver
   if (para->solv->advection_solver == UPWIND && para->solv->check_residual == 1) {
@@ -507,14 +507,14 @@ int vel_step(PARA_DATA *para, REAL **var,int **BINDEX) {
   }
 
   /*Cary debugging*/
-  /*sprintf(msg, "diff center of room u: %f", u[IX(imax / 2, jmax / 2, kmax / 2)]);
+  sprintf(msg, "diff center of room u: %f", u[IX(imax / 4, jmax / 2, kmax / 4)]);
   ffd_log(msg, FFD_NORMAL);
 
-  sprintf(msg, "diff center of room v: %f", v[IX(imax / 2, jmax / 2, kmax / 2)]);
+  sprintf(msg, "diff center of room v: %f", v[IX(imax / 4, jmax / 2, kmax / 4)]);
   ffd_log(msg, FFD_NORMAL);
 
-  sprintf(msg, "diff center of room w: %f", w[IX(imax / 2, jmax / 2, kmax / 2)]);
-  ffd_log(msg, FFD_NORMAL);*/
+  sprintf(msg, "diff center of room w: %f", w[IX(imax / 4, jmax / 2, kmax / 4)]);
+  ffd_log(msg, FFD_NORMAL);
 
   // check residual after iterative solver
   if (para->solv->check_residual == 1) {
@@ -530,14 +530,14 @@ int vel_step(PARA_DATA *para, REAL **var,int **BINDEX) {
   }
 
   /*Cary debugging*/
-  /*sprintf(msg, "proj center of room u: %f", u[IX(imax / 2, jmax / 2, kmax / 2)]);
+  sprintf(msg, "proj center of room u: %f", u[IX(imax / 4, jmax / 2, kmax / 4)]);
   ffd_log(msg, FFD_NORMAL);
 
-  sprintf(msg, "proj center of room v: %f", v[IX(imax / 2, jmax / 2, kmax / 2)]);
+  sprintf(msg, "proj center of room v: %f", v[IX(imax / 4, jmax / 2, kmax / 4)]);
   ffd_log(msg, FFD_NORMAL);
 
-  sprintf(msg, "proj center of room w: %f", w[IX(imax / 2, jmax / 2, kmax / 2)]);
-  ffd_log(msg, FFD_NORMAL);*/
+  sprintf(msg, "proj center of room w: %f", w[IX(imax / 4, jmax / 2, kmax / 4)]);
+  ffd_log(msg, FFD_NORMAL);
 
     // forced mass conservation function is NOT on after projection is Pressure-based correction is applied to tiles.
   if(para->bc->nb_outlet!=0 && para->solv->mass_conservation_on ==1) flag = mass_conservation(para, var,BINDEX);
