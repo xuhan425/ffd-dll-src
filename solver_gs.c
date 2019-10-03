@@ -32,7 +32,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 int GS_itr(PARA_DATA *para, REAL **var, REAL *x, REAL *flag, int num_swipe) {
   REAL *as = var[AS], *aw = var[AW], *ae = var[AE], *an = var[AN];
-  REAL *ap = var[AP], *af = var[AF], *ab = var[AB], *b = var[B], *c = var[C]/*Cary debugging*/;
+  REAL *ap = var[AP], *af = var[AF], *ab = var[AB], *b = var[B];
   int imax = para->geom->imax, jmax = para->geom->jmax;
   int kmax = para->geom->kmax;
   int IMAX = imax + 2, IJMAX = (imax + 2)*(jmax + 2);
@@ -57,7 +57,7 @@ int GS_itr(PARA_DATA *para, REAL **var, REAL *x, REAL *flag, int num_swipe) {
             + as[IX(i, j, k)] * x[IX(i, j - 1, k)]
             + af[IX(i, j, k)] * x[IX(i, j, k + 1)]
             + ab[IX(i, j, k)] * x[IX(i, j, k - 1)]
-            + c[IX(i, j, k)]) / ap[IX(i, j, k)]);
+            + b[IX(i, j, k)]) / ap[IX(i, j, k)]);
         }
     /*-------------------------------------------------------------------------
     | Solve in X in backward direction
@@ -89,7 +89,7 @@ int GS_itr(PARA_DATA *para, REAL **var, REAL *x, REAL *flag, int num_swipe) {
             + as[IX(i, j, k)] * x[IX(i, j - 1, k)]
             + af[IX(i, j, k)] * x[IX(i, j, k + 1)]
             + ab[IX(i, j, k)] * x[IX(i, j, k - 1)]
-            + c[IX(i, j, k)]) / ap[IX(i, j, k)]);
+            + b[IX(i, j, k)]) / ap[IX(i, j, k)]);
         }
 	/*Cary debugging*/
 	for (i = imax; i >= 1; i--)
@@ -103,7 +103,7 @@ int GS_itr(PARA_DATA *para, REAL **var, REAL *x, REAL *flag, int num_swipe) {
 					+ as[IX(i, j, k)] * x[IX(i, j - 1, k)]
 					+ af[IX(i, j, k)] * x[IX(i, j, k + 1)]
 					+ ab[IX(i, j, k)] * x[IX(i, j, k - 1)]
-					+ c[IX(i, j, k)]) / ap[IX(i, j, k)]);
+					+ b[IX(i, j, k)]) / ap[IX(i, j, k)]);
 			}
 	for (j = jmax; j >= 1; j--)
 		for (i = imax; i >= 1; i--)
@@ -116,7 +116,7 @@ int GS_itr(PARA_DATA *para, REAL **var, REAL *x, REAL *flag, int num_swipe) {
 					+ as[IX(i, j, k)] * x[IX(i, j - 1, k)]
 					+ af[IX(i, j, k)] * x[IX(i, j, k + 1)]
 					+ ab[IX(i, j, k)] * x[IX(i, j, k - 1)]
-					+ c[IX(i, j, k)]) / ap[IX(i, j, k)]);
+					+ b[IX(i, j, k)]) / ap[IX(i, j, k)]);
 			} /*end of cary debugging*/
     ///*-------------------------------------------------------------------------
     //| Solve in Y in backward direction
