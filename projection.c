@@ -1,34 +1,34 @@
-///////////////////////////////////////////////////////////////////////////////
-///
-/// \file   projection.c
-///
-/// \brief  Solver for projection step
-///
-/// \author Mingang Jin, Qingyan Chen
-///         Purdue University
-///         Jin55@purdue.edu, YanChen@purdue.edu
-///         Wangda Zuo
-///         University of Miami
-///         W.Zuo@miami.edu
-///         Wei Tian
-///         University of Miami, Schneider Electric
-///         w.tian@umiami.edu, Wei.Tian@Schneider-Electric.com
-///
-/// \date   6/15/2017
-///
-///////////////////////////////////////////////////////////////////////////////
+/****************************************************************************
+| 
+|  \file   projection.c
+| 
+|  \brief  Solver for projection step
+| 
+|  \author Mingang Jin, Qingyan Chen
+|          Purdue University
+|          Jin55@purdue.edu, YanChen@purdue.edu
+|          Wangda Zuo
+|          University of Miami
+|          W.Zuo@miami.edu
+|          Wei Tian
+|          University of Miami, Schneider Electric
+|          w.tian@umiami.edu, Wei.Tian@Schneider-Electric.com
+| 
+|  \date   6/15/2017
+| 
+****************************************************************************/
 
 #include "projection.h"
 
-///////////////////////////////////////////////////////////////////////////////
-/// Project the velocity
-///
-///\param para Pointer to FFD parameters
-///\param var Pointer to FFD simulation variables
-///\param BINDEX Pointer to boundary index
-///
-///\return 0 if no error occurred
-///////////////////////////////////////////////////////////////////////////////
+/****************************************************************************
+|  Project the velocity
+| 
+| \param para Pointer to FFD parameters
+| \param var Pointer to FFD simulation variables
+| \param BINDEX Pointer to boundary index
+| 
+| \return 0 if no error occurred
+****************************************************************************/
 int project(PARA_DATA *para, REAL **var, int **BINDEX) {
   int i, j, k;
   int imax = para->geom->imax, jmax = para->geom->jmax;
@@ -40,7 +40,6 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
   REAL *u = var[VX], *v = var[VY], *w = var[VZ];
   REAL *p = var[IP], *b = var[B], *ap = var[AP], *ab = var[AB], *af = var[AF];
   REAL *ae = var[AE], *aw =var[AW], *an = var[AN], *as = var[AS];
-  REAL *T = var[TEMP]; //Cary debugging
   REAL dxe,dxw, dyn,dys,dzf,dzb,Dx,Dy,Dz;
   REAL *flagu = var[FLAGU],*flagv = var[FLAGV],*flagw = var[FLAGW];
   int num_swipe = para->solv->swipe_pro;
@@ -69,17 +68,9 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
     as[IX(i,j,k)] = Dx*Dz/dys;
     af[IX(i,j,k)] = Dx*Dy/dzf;
     ab[IX(i,j,k)] = Dx*Dy/dzb;
-    b[IX(i,j,k)] = /*rho**/Dx*Dy*Dz/dt*((u[IX(i-1,j,k)]-u[IX(i,j,k)])/Dx
+    b[IX(i,j,k)] = rho*Dx*Dy*Dz/dt*((u[IX(i-1,j,k)]-u[IX(i,j,k)])/Dx
                  + (v[IX(i,j-1,k)]-v[IX(i,j,k)])/Dy
                  + (w[IX(i,j,k-1)]-w[IX(i,j,k)])/Dz);
-
-	/*Cary debugging*/
-	/*if (i == imax / 2 && j == jmax / 2 && k == kmax / 2) {
-		sprintf(msg, "center of room b: %f", b[IX(i, j, k)]);
-		ffd_log(msg, FFD_NORMAL);
-	}*/
-	/*End of debugging*/
-
   END_FOR
 
   /****************************************************************************
@@ -92,22 +83,22 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
                   + af[IX(i,j,k)] + ab[IX(i,j,k)];
   END_FOR
   
-  // solve equations
+  /* solve equations */
   if (para->solv->solver == GS) {
-    GS_itr(para, var, p, flagp, num_swipe);
+    Gauss_Seidel(para, var, p, flagp, num_swipe);
     }
   else {
     Jacobi(para, var, p, flagp, num_swipe);
   }
 
-  // check residual after iterative solver
+  /* check residual after iterative solver */
   if (para->solv->check_residual == 1) {
       residual = check_residual(para, var, p, var[FLAGP]);
       sprintf(msg, "Residual in projection: %f", residual);
       ffd_log(msg, FFD_NORMAL);
   }
 
-  // set boundary condition
+  /* set boundary condition */
   set_bnd_pressure(para, var, p,BINDEX);
 
   /****************************************************************************
@@ -115,42 +106,18 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
   ****************************************************************************/
   FOR_U_CELL
     if (flagu[IX(i,j,k)]>=0) continue;
-    u[IX(i,j,k)] -= dt*(p[IX(i+1,j,k)]-p[IX(i,j,k)]) / (x[IX(i+1,j,k)]-x[IX(i,j,k)]);
-    //u[IX(i, j, k)] -= dt / rho * (p[IX(i + 1, j, k)] - p[IX(i, j, k)]) / (x[IX(i + 1, j, k)] - x[IX(i, j, k)]);
+    u[IX(i,j,k)] -= dt/rho*(p[IX(i+1,j,k)]-p[IX(i,j,k)]) / (x[IX(i+1,j,k)]-x[IX(i,j,k)]);
   END_FOR
 
   FOR_V_CELL
     if (flagv[IX(i,j,k)]>=0) continue;
-    v[IX(i,j,k)] -= dt*(p[IX(i,j+1,k)]-p[IX(i,j,k)]) / (y[IX(i,j+1,k)]-y[IX(i,j,k)]);
-    //v[IX(i, j, k)] -= dt / rho * (p[IX(i, j + 1, k)] - p[IX(i, j, k)]) / (y[IX(i, j + 1, k)] - y[IX(i, j, k)]);
+    v[IX(i,j,k)] -= dt/rho*(p[IX(i,j+1,k)]-p[IX(i,j,k)]) / (y[IX(i,j+1,k)]-y[IX(i,j,k)]);
   END_FOR
 
   FOR_W_CELL
     if (flagw[IX(i,j,k)]>=0) continue;
-    w[IX(i,j,k)] -= dt*(p[IX(i,j,k+1)]-p[IX(i,j,k)]) / (z[IX(i,j,k+1)]-z[IX(i,j,k)]);
-    //w[IX(i, j, k)] -= dt / rho * (p[IX(i, j, k + 1)] - p[IX(i, j, k)]) / (z[IX(i, j, k + 1)] - z[IX(i, j, k)]);
+    w[IX(i,j,k)] -= dt/rho*(p[IX(i,j,k+1)]-p[IX(i,j,k)]) / (z[IX(i,j,k+1)]-z[IX(i,j,k)]);
   END_FOR
-
-	/*sprintf(msg, "center of room u, v, w: %f, %f, %f", u[IX(imax/2, jmax/2, kmax/2)], v[IX(imax / 2, jmax / 2, kmax / 2)], w[IX(imax / 2, jmax / 2, kmax / 2)]);
-	ffd_log(msg, FFD_NORMAL);*/
-
-	/*sprintf(msg, "center of room x, y, z: %f, %f, %f", x[IX(imax / 2, jmax / 2, kmax / 2)], y[IX(imax / 2, jmax / 2, kmax / 2)], z[IX(imax / 2, jmax / 2, kmax / 2)]);
-	ffd_log(msg, FFD_NORMAL);
-
-	sprintf(msg, "center of room P: %f", p[IX(imax / 2, jmax / 2, kmax / 2)]);
-	ffd_log(msg, FFD_NORMAL);
-
-	sprintf(msg, "center of room T: %f", T[IX(imax / 2, jmax / 2, kmax / 2)]);
-	ffd_log(msg, FFD_NORMAL);
-
-	sprintf(msg, "center of room dP/dx: %f", (p[IX((imax/2)+1, jmax / 2, kmax / 2)] - p[IX(imax / 2, jmax / 2, kmax / 2)])/(x[IX((imax / 2) + 1, jmax / 2, kmax / 2)] - x[IX(imax / 2, jmax / 2, kmax / 2)]));
-	ffd_log(msg, FFD_NORMAL);
-
-	sprintf(msg, "center of room dP/dy: %f", (p[IX(imax / 2, (jmax / 2) + 1, kmax / 2)] - p[IX(imax / 2, jmax / 2, kmax / 2)]) / (y[IX((imax / 2) , (jmax / 2) + 1, kmax / 2)] - y[IX(imax / 2, jmax / 2, kmax / 2)]));
-	ffd_log(msg, FFD_NORMAL);
-
-	sprintf(msg, "center of room dP/dz: %f", (p[IX((imax / 2), jmax / 2, (kmax / 2) + 1)] - p[IX(imax / 2, jmax / 2, kmax / 2)]) / (z[IX((imax / 2) , jmax / 2, (kmax / 2) + 1)] - z[IX(imax / 2, jmax / 2, kmax / 2)]));
-	ffd_log(msg, FFD_NORMAL);*/
 
   /****************************************************************************
   | Check mass imbalance if needed
@@ -162,18 +129,18 @@ int project(PARA_DATA *para, REAL **var, int **BINDEX) {
   }
 
   return 0;
-} // End of project( )
+} /* End of project( ) */
 
-///////////////////////////////////////////////////////////////////////////////
-/// Check the mass imbalance after projjection
-/// This usually indicates that the energy balance after advection could be problematic.
-///
-///\param para Pointer to FFD parameters
-///\param var Pointer to FFD simulation variables
-///\param BINDEX Pointer to boundary index
-///
-///\return 0 if no error occurred
-///////////////////////////////////////////////////////////////////////////////
+/****************************************************************************
+|  Check the mass imbalance after projjection
+|  This usually indicates that the energy balance after advection could be problematic.
+| 
+| \param para Pointer to FFD parameters
+| \param var Pointer to FFD simulation variables
+| \param BINDEX Pointer to boundary index
+| 
+| \return 0 if no error occurred
+****************************************************************************/
 int check_mass_imbalance(PARA_DATA *para, REAL **var) {
     int i, j, k;
     int imax = para->geom->imax, jmax = para->geom->jmax;

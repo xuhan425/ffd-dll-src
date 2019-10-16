@@ -1,40 +1,40 @@
-///////////////////////////////////////////////////////////////////////////////
-///
-/// \file   chen_zero_equ_model.c
-///
-/// \brief  Computes turbulent viscosity using Chen's zero equ model
-///
-/// \author Mingang Jin, Qingyan Chen
-///         Purdue University
-///         Jin55@purdue.edu, YanChen@purdue.edu
-///         Wangda Zuo
-///         University of Miami
-///         W.Zuo@miami.edu
-///					Wei Tian
-///					University of Miami, Schneider Electric
-///					w.tian@umiami.edu, Wei.Tian@Schneider-Electric.com
-///
-/// \date   7/05/2017
-///
-/// This file provides function that computes the turbulent viscosity using
-/// Chen's zero equation model
-///
-/// Update the standard Chen's zero equation model by add Jim's revision on 
-/// boundary cells, by Wei Tian
-///////////////////////////////////////////////////////////////////////////////
+/****************************************************************************
+| 
+|  \file   chen_zero_equ_model.c
+| 
+|  \brief  Computes turbulent viscosity using Chen's zero equ model
+| 
+|  \author Mingang Jin, Qingyan Chen
+|          Purdue University
+|          Jin55@purdue.edu, YanChen@purdue.edu
+|          Wangda Zuo
+|          University of Miami
+|          W.Zuo@miami.edu
+| 		   Wei Tian
+| 		   University of Miami, Schneider Electric
+| 		   w.tian@umiami.edu, Wei.Tian@Schneider-Electric.com
+| 
+|  \date   7/05/2017
+| 
+|  This file provides function that computes the turbulent viscosity using
+|  Chen's zero equation model
+| 
+|  Update the standard Chen's zero equation model by add Jim's revision on 
+|  boundary cells, by Wei Tian
+****************************************************************************/
 #include "chen_zero_equ_model.h"
 
-///////////////////////////////////////////////////////////////////////////////
-/// Computes turbulent viscosity using Chen's zero equation model
-///
-///\param para Pointer to FFD parameters
-///\param var Pointer to FFD simulation variables
-///\param i I-index of the control volume
-///\param j J-index of the control volume
-///\param k K-index of the control volume
-///
-///\return Turbulent Kinematic viscosity
-///////////////////////////////////////////////////////////////////////////////
+/****************************************************************************
+|  Computes turbulent viscosity using Chen's zero equation model
+| 
+| \param para Pointer to FFD parameters
+| \param var Pointer to FFD simulation variables
+| \param i I-index of the control volume
+| \param j J-index of the control volume
+| \param k K-index of the control volume
+| 
+| \return Turbulent Kinematic viscosity
+****************************************************************************/
 REAL nu_t_chen_zero_equ(PARA_DATA *para, REAL **var, int i, int j, int k) {
   REAL nu_t, l;
   REAL *x = var[X], *y = var[Y], *z = var[Z];
@@ -47,16 +47,16 @@ REAL nu_t_chen_zero_equ(PARA_DATA *para, REAL **var, int i, int j, int k) {
     REAL jim_a = 0.0185;
   REAL lx=0, ly=0, lz =0;
   REAL lx1=0,lx2=0, ly1=0, ly2=0, lz1=0, lz2=0;
-        /***************************************************************************/
-        // reserve the flexibility to implement the revised CHEN's model
-        // proposed by Jim and Chris, assigning a different coefficient of chen_a
-        // for the fluid cell adjacent to the boudnary cells
-        // Refer to the Turbulence_Model_Assessment_v17.pdf
-        //\ Note Makers: Wei Tian
-        //\ Contact: Wei.Tian@Schneider-Electric.com, Schneider Electric
-        //\ Date: 7/04/2017
-        /***************************************************************************/
-        //l = var[MIN_DISTANCE][IX(i, j, k)];
+        /****************************************************************************
+        |  reserve the flexibility to implement the revised CHEN's model
+        |  proposed by Jim and Chris, assigning a different coefficient of chen_a
+        |  for the fluid cell adjacent to the boudnary cells
+        |  Refer to the Turbulence_Model_Assessment_v17.pdf
+        | \ Note Makers: Wei Tian
+        | \ Contact: Wei.Tian@Schneider-Electric.com, Schneider Electric
+        | \ Date: 7/04/2017
+        ****************************************************************************/
+        /*l = var[MIN_DISTANCE][IX(i, j, k)];*/
         lx1 = x[IX(i,j,k)] - x[IX(0,j,k)];
         lx2 = x[IX(imax+1,j,k)] - x[IX(i,j,k)];
         lx = lx1 < lx2 ? lx1 : lx2;
@@ -71,16 +71,16 @@ REAL nu_t_chen_zero_equ(PARA_DATA *para, REAL **var, int i, int j, int k) {
 
         l = lx < ly ? lx : ly;
         l = lz < l ? lz : l;
-        // check if sorrounding cell is solid
+        /* check if sorrounding cell is solid */
 
         if (flagp[IX(i - 1, j, k)] >= 0 || flagp[IX(i + 1, j, k)] >= 0 ||
                         flagp[IX(i, j - 1, k)] >= 0 || flagp[IX(i, j + 1, k)] >= 0 ||
                         flagp[IX(i, j, k - 1)] >= 0 || flagp[IX(i, j, k + 1)] >= 0) {
-                // if the cell is adjacent to solid boundaries, assign a otherwise coffecient
+                /* if the cell is adjacent to solid boundaries, assign a otherwise coffecient */
                 coeff = jim_a;
         }
         else {
-                // if the cell is not adjacent to solid boundaries, assign a standard coffecient
+                /* if the cell is not adjacent to solid boundaries, assign a standard coffecient */
                 coeff = para->prob->chen_a;
         }
 
@@ -90,34 +90,34 @@ REAL nu_t_chen_zero_equ(PARA_DATA *para, REAL **var, int i, int j, int k) {
                                         +w[IX(i,j,k)]*w[IX(i,j,k)] );
 
   return nu_t;
-} // End of nu_t_chen_zero_equ()
+} /* End of nu_t_chen_zero_equ() */
 
-///////////////////////////////////////////////////////////////////////////////
-/// Computes turbulent thermal diffusivity using Chen's zero equation model
-///
-///\param para Pointer to FFD parameters
-///\param var Pointer to FFD simulation variables
-///
-///\Author: Wei Tian @ Schneider Electric, Andover, MA
-///
-///\Initial Implementation: 7/11/2017
-///\return Turbulent Kinematic viscosity
-///
-///\ This is to reimplement the turbulent thermal diffusivity for FFD using Chen's
-///  zero equation model. Theoretically, by diving the turbulent viscosity over the 
-///  Pr number, we can easily get the turbulent themal diffusivity coefficients. However,
-///  according to our test, that could cause severe energy imblance for the whole space.
-///  The root reason to explain that is not fully identified yet. However, we presumbaly beleive that
-///  the dradmatically (over 100) spatial differnce of the thermal diffusivity coefficiet may lead to
-///  energy imbalance, happening in the diffusion term. We also tried using constant turbulence model, 
-///  which essentially multiply 100 to the lamninar one. Applying that in the FFD, we did not see
-///  the deterioration of energy balance, at any level.
-///\ Inspire by this, we propose to uniformly disseminate the turbulent thermal diffusivity over the 
-///  whole fluid space. According to our test, this method can perfectly achieves energy balance for 
-///  the room space, while keeping the turbulent features in some extent of the thermal environment.
-///
-///\ Last update: 7/11/2017
-///////////////////////////////////////////////////////////////////////////////
+/****************************************************************************
+|  Computes turbulent thermal diffusivity using Chen's zero equation model
+| 
+| \param para Pointer to FFD parameters
+| \param var Pointer to FFD simulation variables
+| 
+| \Author: Wei Tian @ Schneider Electric, Andover, MA
+| 
+| \Initial Implementation: 7/11/2017
+| \return Turbulent Kinematic viscosity
+| 
+| \ This is to reimplement the turbulent thermal diffusivity for FFD using Chen's
+|   zero equation model. Theoretically, by diving the turbulent viscosity over the 
+|   Pr number, we can easily get the turbulent themal diffusivity coefficients. However,
+|   according to our test, that could cause severe energy imblance for the whole space.
+|   The root reason to explain that is not fully identified yet. However, we presumbaly beleive that
+|   the dradmatically (over 100) spatial differnce of the thermal diffusivity coefficiet may lead to
+|   energy imbalance, happening in the diffusion term. We also tried using constant turbulence model, 
+|   which essentially multiply 100 to the lamninar one. Applying that in the FFD, we did not see
+|   the deterioration of energy balance, at any level.
+| \ Inspire by this, we propose to uniformly disseminate the turbulent thermal diffusivity over the 
+|   whole fluid space. According to our test, this method can perfectly achieves energy balance for 
+|   the room space, while keeping the turbulent features in some extent of the thermal environment.
+| 
+| \ Last update: 7/11/2017
+****************************************************************************/
 REAL alpha_t_chen_zero_equ(PARA_DATA *para, REAL **var) {
         int i, j, k;
         REAL *x = var[X], *y = var[Y], *z = var[Z];
@@ -135,7 +135,7 @@ REAL alpha_t_chen_zero_equ(PARA_DATA *para, REAL **var) {
                 count += 1;
         END_FOR
 
-        return sum_tur_alpha / count; // turbulent alpha for each cell
-} // end of alpha_t
+        return sum_tur_alpha / count; /* turbulent alpha for each cell */
+} /* end of alpha_t */
 
 

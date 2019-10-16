@@ -1016,11 +1016,5 @@ int set_sensor_data(PARA_DATA *para, REAL **var) {
   /*Velocity at the center of the space*/
   para->sens->senVal[1] = sqrt(u*u + v*v + w*w);
 
-/*Cary debugging*/
-  /*sprintf(msg, "u, v, w: %f, %f, %f",
-	  u, v, w);
-  ffd_log(msg, FFD_NORMAL);*/
-  /*end of debugging*/
-
   return 0;
 } /* End of set_sensor_data*/

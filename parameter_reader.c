@@ -1,35 +1,35 @@
-///////////////////////////////////////////////////////////////////////////////
-///
-/// \file   parameter_reader.c
-///
-/// \brief  Read the FFD parameter file
-///
-/// \author Wangda Zuo
-///         University of Miami
-///         W.Zuo@miami.edu
-///         Wei Tian
-///         University of Miami, Schneider Electric
-///         w.tian@umiami.edu, Wei.Tian@Schneider-Electric.com
-///
-/// \date   6/15/2017
-///
-///////////////////////////////////////////////////////////////////////////////
+/****************************************************************************
+|
+|  \file   parameter_reader.c
+|
+|  \brief  Read the FFD parameter file
+|
+|  \author Wangda Zuo
+|          University of Miami
+|          W.Zuo@miami.edu
+|          Wei Tian
+|          University of Miami, Schneider Electric
+|          w.tian@umiami.edu, Wei.Tian@Schneider-Electric.com
+|
+|  \date   6/15/2017
+|
+****************************************************************************/
 
 #include "parameter_reader.h"
 
-///////////////////////////////////////////////////////////////////////////////
-/// Assign the FFD parameters
-///
-///\param para Pointer to FFD parameters
-///\param string Pointer to data read from the parameter file
-///
-///\return 0 if no error occurred
-///////////////////////////////////////////////////////////////////////////////
+/****************************************************************************
+|  Assign the FFD parameters
+|
+| \param para Pointer to FFD parameters
+| \param string Pointer to data read from the parameter file
+|
+| \return 0 if no error occurred
+****************************************************************************/
 int assign_parameter(PARA_DATA *para, char *string) {
   char tmp[400];
   char tmp_par[400];
-  // tmp2 needs to be initialized to avoid crash
-  // when the input for tmp2 is empty
+  /* tmp2 needs to be initialized to avoid crash */
+  /* when the input for tmp2 is empty */
   char tmp2[100] = "";
   int senId = -1;
 
@@ -602,54 +602,54 @@ int assign_parameter(PARA_DATA *para, char *string) {
     | if it is the first name, allocate memory for para->sens->sensorName
     ------------------------------------------------------------------------*/
     if(para->sens->sensorName==NULL) {
-      // The number of sensor must be defined before we allocate memory for
-      // para->sens->sensorName
-      if(para->sens->nb_sensor==0) {
-        sprintf(msg, "assign_parameter(): Must define the number of sensors "
-          "before giving the sensor names");
-        ffd_log(msg, FFD_ERROR);
-        return 1;
-      } // End of if(para->sens->nb_sensor==0)
-      else {
-        para->sens->sensorName = (char **) malloc(para->sens->nb_sensor*sizeof(char *));
-        if(para->sens->sensorName==NULL) {
-          ffd_log("assign_parameter(): Could not allocate memory for "
-                  "para->sens->sensorName", FFD_ERROR);
-          return 1;
-        }
-      } // End of else
+		/* The number of sensor must be defined before we allocate memory for */
+		/* para->sens->sensorName */
+		if (para->sens->nb_sensor == 0) {
+			sprintf(msg, "assign_parameter(): Must define the number of sensors "
+				"before giving the sensor names");
+			ffd_log(msg, FFD_ERROR);
+			return 1;
+		} /* End of if(para->sens->nb_sensor==0) */
+		else {
+			para->sens->sensorName = (char**)malloc(para->sens->nb_sensor * sizeof(char*));
+			if (para->sens->sensorName == NULL) {
+				ffd_log("assign_parameter(): Could not allocate memory for "
+					"para->sens->sensorName", FFD_ERROR);
+				return 1;
+			}
+		} /* End of else */
 
-    } // End of if(para->sens->nb_sensor==0)
+	} /* End of if(para->sens->nb_sensor==0) */
 
-    /*------------------------------------------------------------------------
-    | Copy the sensor name
-    ------------------------------------------------------------------------*/
-    sscanf(string, "%s%s", tmp, tmp2);
-    senId++;
-    para->sens->sensorName[senId] = (char *) malloc(sizeof(tmp2)*sizeof(char));
-    if(para->sens->sensorName[senId]==NULL) {
-      sprintf(msg, "assign_parameter(): Could not allocate memory for %s",
-              tmp2);
-      ffd_log(msg, FFD_ERROR);
-      return 1;
-    }
-    else {
-      strcpy(para->sens->sensorName[senId], tmp2);
-      sprintf(msg, "assign_parameter(): %s=%s", tmp,  para->sens->sensorName[senId]);
-      ffd_log(msg, FFD_NORMAL);
-    }
+	/*------------------------------------------------------------------------
+	| Copy the sensor name
+	------------------------------------------------------------------------*/
+	sscanf(string, "%s%s", tmp, tmp2);
+	senId++;
+	para->sens->sensorName[senId] = (char*)malloc(sizeof(tmp2) * sizeof(char));
+	if (para->sens->sensorName[senId] == NULL) {
+		sprintf(msg, "assign_parameter(): Could not allocate memory for %s",
+			tmp2);
+		ffd_log(msg, FFD_ERROR);
+		return 1;
+	}
+	else {
+		strcpy(para->sens->sensorName[senId], tmp2);
+		sprintf(msg, "assign_parameter(): %s=%s", tmp, para->sens->sensorName[senId]);
+		ffd_log(msg, FFD_NORMAL);
+	}
   }
 
   return 0;
-} // End of assign_parameter()
+} /* End of assign_parameter() */
 
-///////////////////////////////////////////////////////////////////////////////
-/// Read the FFD parameter file input.ffd
-///
-///\param para Pointer to FFD parameters
-///
-///\return 0 if no error occurred
-///////////////////////////////////////////////////////////////////////////////
+/****************************************************************************
+|  Read the FFD parameter file input.ffd
+|
+| \param para Pointer to FFD parameters
+|
+| \return 0 if no error occurred
+****************************************************************************/
 int read_parameter(PARA_DATA *para) {
   char string[400];
 
@@ -699,7 +699,7 @@ int read_parameter(PARA_DATA *para) {
 	  }
   }
 
-  //Use fgets(...) as loop condition, it reutrns null when it fail to read more characters.
+  /*Use fgets(...) as loop condition, it reutrns null when it fail to read more characters.*/
   while(fgets(string, 400, file_para) != NULL) {
     if(assign_parameter(para, string)) {
 	  sprintf(msg, "read_parameter(): Could not read data from file %s",
@@ -707,11 +707,11 @@ int read_parameter(PARA_DATA *para) {
       ffd_log(msg, FFD_ERROR);
       return 1;
     }
-  }// End of while
+  }/* End of while */
 
-  //Check if it is end of file
-  //Use feof() to detect what went wrong after one of the main I/O functions failed
-  //Do not use feof() as condition of while loop. It will read one more time after last line.
+  /*Check if it is end of file*/
+  /*Use feof() to detect what went wrong after one of the main I/O functions failed*/
+  /*Do not use feof() as condition of while loop. It will read one more time after last line.*/
   if (!feof(file_para)){
 	  sprintf(msg, "read_parameter(): Could not read data from file %s",
 		  para->cosim->para->fileName);
@@ -720,4 +720,4 @@ int read_parameter(PARA_DATA *para) {
 
   fclose(file_para);
   return 0;
-} // End of read_parameter()
+} /* End of read_parameter() */

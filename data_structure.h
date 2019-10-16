@@ -153,19 +153,19 @@ Place the stdlib.h line above the glut.h line in the code.
 #define C2S 53
 #define C1BC 54
 #define TMP4 55
-#define MIN_DISTANCE 56 // the minimal distance to the boundaries, using in zero equation model
-#define TILE_OPEN_BC 57 // the opening ratio of the tiles
-#define TILE_RESI_BC 58 // the corresponding resistance ratio of the opening ratio for the tiles
-#define TILE_FLOW_BC 59 // the velocity at each tile
-#define PBC 60 // the pressure boundary condition for outlets/tiles
-#define IPS 61 // the pressure source associated with the tile when simulating the room and plenum together
-#define APXS 62 // Source for AP VX
-#define APYS 63 // Source for AP VY
-#define APZS 64 // Source for AP VZ
-#define RESX 65 // Resistance in X, i.e., tile, plastic curtain, etc.
-#define RESY 66 // Resistance source in Y, i.e., tile, plastic curtain, etc.
-#define RESZ 67 // Resistance source in Z, i.e., tile, plastic curtain, etc.
-#define C2BC 68  // Last variable
+#define MIN_DISTANCE 56 /* the minimal distance to the boundaries, using in zero equation model */
+#define TILE_OPEN_BC 57 /* the opening ratio of the tiles */
+#define TILE_RESI_BC 58 /* the corresponding resistance ratio of the opening ratio for the tiles */
+#define TILE_FLOW_BC 59 /* the velocity at each tile */
+#define PBC 60 /* the pressure boundary condition for outlets/tiles */
+#define IPS 61 /* the pressure source associated with the tile when simulating the room and plenum together */
+#define APXS 62 /* Source for AP VX */
+#define APYS 63 /* Source for AP VY */
+#define APZS 64 /* Source for AP VZ */
+#define RESX 65 /* Resistance in X, i.e., tile, plastic curtain, etc. */
+#define RESY 66 /* Resistance source in Y, i.e., tile, plastic curtain, etc. */
+#define RESZ 67 /* Resistance source in Z, i.e., tile, plastic curtain, etc. */
+#define C2BC 68  /* Last variable */
 
 typedef enum{NOSLIP, SLIP, INFLOW, OUTFLOW, PERIODIC, SYMMETRY} BCTYPE;
 
@@ -221,9 +221,9 @@ typedef struct {
   REAL  dz; /* Length delta_z of one cell in z-direction for uniform grid only*/
   REAL  volFlu; /* Total volume of fluid cells*/
   int   uniform; /* Only for generating grid by FFD. 1: uniform grid; 0: non-uniform grid*/
-  int tile_putX; // tile is put in X direction
-  int tile_putY; // tile is put in Y direction
-  int tile_putZ; // tile is put in Z direction
+  int tile_putX; /* tile is put in X direction */
+  int tile_putY; /* tile is put in Y direction */
+  int tile_putZ; /* tile is put in Z direction */
 } GEOM_DATA;
 
 /* Parameter for the data output control*/
@@ -250,16 +250,16 @@ typedef struct{
   VERSION version; /* DEMO, DEBUG, RUN*/
   int screen; /* Screen for display: 1 velocity; 2: temperature; 3: contaminant*/
   int tstep_display; /* Number of time steps to update the visualization*/
-  int mouse_i; // mouse click located i
-  int mouse_j; //mouse click located j
-  int mouse_k; // mouse click located k
-  RLT_FILE result_file; // result file type
-  int OutputDynamicFile; //determine if wants to determine the files for animation
+  int mouse_i; /* mouse click located i */
+  int mouse_j; /*mouse click located j*/
+  int mouse_k; /* mouse click located k */
+  RLT_FILE result_file; /* result file type */
+  int OutputDynamicFile; /*determine if wants to output the files for animation*/
 } OUTP_DATA;
 
 typedef struct {
-	int cal_mean; // 1: Calculate mean value; 0: False
-	VERSION version; // DEMO, DEBUG, RUN
+	int cal_mean; /*1: Calculate mean value; 0: False*/
+	VERSION version; /* DEMO, DEBUG, RUN*/
 } OUTP_DATA_SIMP;
 
 typedef struct{
@@ -292,10 +292,10 @@ typedef struct{
   REAL chen_a; /* Coefficient of Chen's zero equation turbulence model*/
   REAL Prt; /* Turbulent Prandtl number*/
   REAL Temp_Buoyancy; /* Reference temperature for calculating buoyancy force*/
-  REAL Tem_Ave_LastTime; // Record average fluid temeprature in last time
-  REAL Energy_Imb_Adv; // Energy imbalance after advection, W
-  REAL coef_CONSTANT; // Constant for constant turbulence models
-  REAL coef_stanchion; // the stanchion model coefficient
+  REAL Tem_Ave_LastTime; /* Record average fluid temeprature in last time */
+  REAL Energy_Imb_Adv; /* Energy imbalance after advection, W */
+  REAL coef_CONSTANT; /* Constant for constant turbulence models */
+  REAL coef_stanchion; /* the stanchion model coefficient */
 }PROB_DATA;
 
 typedef struct {
@@ -316,7 +316,7 @@ typedef struct {
   char **portName; /* *portName[nb_port]: Name of ports*/
   char **blockName; /* *blockName[nb_block]: Name of internal block*/
   char **sourceName; /* *sourceName[nb_source]: Name of the source*/
-  char** rackName; // *rackNmae[nb_rack]: name of rack
+  char** rackName; /* *rackNmae[nb_rack]: name of rack */
   int *wallId; /* wallId[nb_wall]: Modelica wall boundary ID*/
   /*int *inletId; // Modelica inlet boundary ID*/
   int *portId; /* portId[nb_port]: Modelica outlet boundary ID*/
@@ -327,7 +327,7 @@ typedef struct {
   REAL *temHeaMean; /* temHeaMean[nb_wall]: Time averaged value of temHeaAve*/
   REAL *velPort; /* velPort[nb_port]: Velocity of air into the room*/
                       /* positive: into the room; negative out of the room*/
-  REAL* QPort; // mass flowrate of the port
+  REAL* QPort; /* mass flowrate of the port */
   REAL *velPortAve; /* velPortAve[nb_port]: Surface averaged value of velPort*/
   REAL *velPortMean; /* velPortMean[nb_port]: Time averaged value of velPortAve*/
   REAL *TPort; /* TPort[nb_port] Air temperatures that the medium has if it were flowing into the room*/
@@ -339,31 +339,31 @@ typedef struct {
   REAL **CPort; /* CPor[nb_port][nb_C]: the trace substances of the inflowing medium*/
   REAL **CPortAve; /* CPortAve[nb_port][nb_C]: Surface averaged value of CPort*/
   REAL **CPortMean; /* CPortMean[nb_port][nb_C]: Time averaged value of CPort*/
-  int nb_rack; // number of rack in the data center room
-  int** RackMap; // Map the inlet and outlet cell of rack, a N by 3 array, where N is number of racks
-  REAL* RackFlowRate; // The volumetric flow rate for each rack in M3/s, a vector of N elements
-  int* RackDir; // The cooling air flow direction of the rack, +1: X, -1: Y, +2: Y, -2: -Y, +3: Z, -3: -Z
-  REAL* HeatDiss; // Heat dissipation of rack in W, a vector of N element
-  REAL* RackArea; // Inlet or outlet area of rack, a vector of N element
-  BC_TYPE outlet_bc; // type of outlet bc
+  int nb_rack; /* number of rack in the data center room */
+  int** RackMap; /* Map the inlet and outlet cell of rack, a N by 3 array, where N is number of racks */
+  REAL* RackFlowRate; /* The volumetric flow rate for each rack in M3/s, a vector of N elements */
+  int* RackDir; /* The cooling air flow direction of the rack, +1: X, -1: Y, +2: Y, -2: -Y, +3: Z, -3: -Z */
+  REAL* HeatDiss; /* Heat dissipation of rack in W, a vector of N element */
+  REAL* RackArea; /* Inlet or outlet area of rack, a vector of N element */
+  BC_TYPE outlet_bc; /* type of outlet bc */
 }BC_DATA;
 
 typedef struct {
-	int nb_inlet; // Number of inlet boundaries, provided by SCI
-	int nb_outlet; // Number of outlet boundaries, provided by SCI
-	int nb_block; // Number of internal block boundaries, provided by SCI
-	int nb_wall; // Number of wall boundaries, provided by SCI
-	int nb_source; // Number of sources, provided by SCI
-	int nb_bc; // Number of boundaries, provided by SCI
-	int nb_ConExtWin; // Number of exterior construction with windows
-	int nb_port; // nPort = nInlet + nOutlet
-	int nb_Xi; // Number of species
-	int nb_C; // Number of substances
-	int sha; // 1: have shade ; 0: no shade
+	int nb_inlet; /* Number of inlet boundaries, provided by SCI */
+	int nb_outlet; /* Number of outlet boundaries, provided by SCI */
+	int nb_block; /* Number of internal block boundaries, provided by SCI */
+	int nb_wall; /* Number of wall boundaries, provided by SCI */
+	int nb_source; /* Number of sources, provided by SCI */
+	int nb_bc; /* Number of boundaries, provided by SCI */
+	int nb_ConExtWin; /* Number of exterior construction with windows */
+	int nb_port; /* nPort = nInlet + nOutlet */
+	int nb_Xi; /* Number of species */
+	int nb_C; /* Number of substances */
+	int sha; /* 1: have shade ; 0: no shade */
 	REAL mass_in;
 	REAL mass_out;
 	REAL mass_corr;
-	BC_TYPE outlet_bc; // type of outlet bc
+	BC_TYPE outlet_bc; /* type of outlet bc */
 }BC_DATA_SIMP;
 
 typedef struct {
@@ -374,14 +374,14 @@ typedef struct {
   REAL *senValMean; /* snValMean[nb_sensor]: Time averaged value of senVal;*/
   REAL TRoo; /* Volumed averaged value of temperature in the space*/
   REAL TRooMean; /* Time averaged value of TRoo;*/
-  REAL*** coordMoniPoints; //coordMoniPoints[A][B][C]-> A: which rack; B: which monitor point; C: which coordinate
-  int*** indexMoniPoints; // indexMoniPoints[A][B][C]-> A: which rack; B: which monitor point; C: which coordinate
+  REAL*** coordMoniPoints; /*coordMoniPoints[A][B][C]-> A: which rack; B: which monitor point; C: which coordinate*/
+  int*** indexMoniPoints; /* indexMoniPoints[A][B][C]-> A: which rack; B: which monitor point; C: which coordinate*/
 } SENSOR_DATA;
 
 typedef struct {
-	int nb_sensor; // Number of sensors
-	REAL TRoo; // Volumed averaged value of temperature in the space
-	REAL TRooMean; // Time averaged value of TRoo;
+	int nb_sensor; /* Number of sensors */
+	REAL TRoo; /* Volumed averaged value of temperature in the space */
+	REAL TRooMean; /* Time averaged value of TRoo; */
 } SENSOR_DATA_SIMP;
 
 typedef struct {
@@ -396,29 +396,29 @@ typedef struct {
 }TIME_DATA;
 
 typedef struct {
-	REAL dt; // FFD simulation time step size
-	REAL t; // Internal: current time
-	REAL t_steady; // Necessary time for reaching the steady state from initial condition
-	int step_total; // The interval of iteration step to output data
-	int step_current; // Internal: current iteration step
-	int step_mean; // Internal: steps for time average
-	REAL t_start; // Internal: clock time when simulation starts
-	REAL t_end; // Internal: clock time when simulation ends
+	REAL dt; /* FFD simulation time step size */
+	REAL t; /* Internal: current time */
+	REAL t_steady; /* Necessary time for reaching the steady state from initial condition */
+	int step_total; /* The interval of iteration step to output data */
+	int step_current; /* Internal: current iteration step */
+	int step_mean; /* Internal: steps for time average */
+	REAL t_start; /* Internal: clock time when simulation starts */
+	REAL t_end; /* Internal: clock time when simulation ends */
 }GPU_TIME_DATA;
 
 typedef struct {
   SOLVERTYPE solver;  /* Solver type: GS, TDMA*/
   int check_residual; /* 1: check, 0: donot check*/
-  int check_conservation; //1: check, 0 : donot check residual after iterative solver
+  int check_conservation; /*1: check, 0 : donot check residual after iterative solver*/
   ADVECTION advection_solver; /* Type of advection solver: SEMI, LAX, UPWIND, UPWIND_NEW*/
   INTERPOLATION interpolation; /* Interpolation in semi-Lagrangian method: BILINEAR, FSJ, HYBRID*/
   int cosimulation;  /* 0: single; 1: coupled simulation*/
   int nextstep; /* Internal: 1: yes; 0: no, wait*/
-  int swipe_adv; // swipe numbers in GS for advection, if using implicit scheme
-  int swipe_dif; // swipe numbers in GS for diffusion
-  int swipe_pro; // swipe numbers in GS for projection
-  TILE_FLOW_CORRECTION tile_flow_correct; // how to correct the flow rates at tiles
-  int mass_conservation_on; // apply forced mass conservation or not
+  int swipe_adv; /* swipe numbers in GS for advection, if using implicit scheme */
+  int swipe_dif; /* swipe numbers in GS for diffusion */
+  int swipe_pro; /* swipe numbers in GS for projection */
+  TILE_FLOW_CORRECTION tile_flow_correct; /* how to correct the flow rates at tiles */
+  int mass_conservation_on; /* apply forced mass conservation or not */
 }SOLV_DATA;
 
 typedef struct {
